@@ -1,0 +1,139 @@
+import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+
+import 'package:mobile_mikufans/service/util/store_util.dart';
+import 'package:mobile_mikufans/ui/screen/detail.dart';
+import 'package:mobile_mikufans/ui/screen/history.dart';
+import 'package:mobile_mikufans/ui/screen/home.dart';
+import 'package:mobile_mikufans/ui/screen/player.dart';
+
+import 'package:mobile_mikufans/ui/screen/setting.dart';
+import 'package:mobile_mikufans/ui/screen/subscribe.dart';
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Store.init();
+  runApp(const MyApp());
+}
+
+class MyApp extends StatefulWidget {
+  static final themeNotifier = ValueNotifier<ThemeMode>(ThemeMode.system);
+  const MyApp({super.key});
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  late final GoRouter _router = GoRouter(
+    // observers: [routeObserver],
+    initialLocation: '/home',
+    routes: [
+      StatefulShellRoute.indexedStack(
+        builder: (context, state, navigationShell) {
+          return ScaffoldWithNavBar(navigationShell: navigationShell);
+        },
+        branches: [
+          StatefulShellBranch(
+            routes: [
+              GoRoute(path: '/home', builder: (context, state) => HomeScreen()),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/subscribe',
+                builder: (context, state) => SubscribeScreen(),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/history',
+                builder: (context, state) => HistoryScreen(),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/setting',
+                builder: (context, state) => SetttingScreen(),
+              ),
+            ],
+          ),
+        ],
+      ),
+      GoRoute(
+        path: '/detail',
+        builder: (context, state) => DetailScreen(id: state.extra as int),
+      ),
+
+      GoRoute(path: '/player', builder: (context, state) => PlayerScreen()),
+    ],
+  );
+  @override
+  Widget build(BuildContext context) {
+    return ValueListenableBuilder<ThemeMode>(
+      valueListenable: MyApp.themeNotifier,
+      builder: (context, themeMode, child) {
+        return MaterialApp.router(
+          debugShowCheckedModeBanner: false,
+          routerConfig: _router,
+          title: 'MikuFans',
+          themeMode: ThemeMode.system,
+          theme: ThemeData(
+            brightness: Brightness.light,
+            colorSchemeSeed: const Color(0xfffb739a),
+            useMaterial3: true,
+          ),
+          darkTheme: ThemeData(
+            colorSchemeSeed: const Color(0xfffb739a),
+            brightness: Brightness.dark,
+            useMaterial3: true,
+          ),
+        );
+      },
+    );
+  }
+}
+
+class ScaffoldWithNavBar extends StatelessWidget {
+  final StatefulNavigationShell navigationShell;
+
+  const ScaffoldWithNavBar({super.key, required this.navigationShell});
+
+  @override
+  Widget build(BuildContext context) {
+    final router = GoRouter.of(context);
+    var currentPath = router.routerDelegate.currentConfiguration.uri.toString();
+    return Scaffold(
+      bottomNavigationBar: BottomNavigationBar(
+        selectedItemColor: Theme.of(context).colorScheme.primary,
+        unselectedItemColor: Theme.of(context).colorScheme.onSurfaceVariant,
+        items: const [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home_rounded),
+            label: 'Home',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.subscriptions_rounded),
+            label: 'Subscribe',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.history_rounded),
+            label: 'History',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.settings_rounded),
+            label: 'Setting',
+          ),
+        ],
+        currentIndex: navigationShell.currentIndex,
+        onTap: (index) => navigationShell.goBranch(index),
+      ),
+      body: navigationShell,
+    );
+  }
+}
