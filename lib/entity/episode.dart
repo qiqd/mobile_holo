@@ -3,7 +3,7 @@ part 'episode.g.dart';
 
 /// 剧集信息实体类
 @JsonSerializable()
-class Data {
+class EpisodeData {
   /// 放送日期
   @JsonKey(name: 'air_date')
   final String? airDate;
@@ -47,7 +47,7 @@ class Data {
   @JsonKey(name: 'duration_seconds')
   final int? durationSeconds;
 
-  Data({
+  EpisodeData({
     this.airDate,
     this.name,
     this.nameCn,
@@ -63,16 +63,17 @@ class Data {
     this.durationSeconds,
   });
 
-  factory Data.fromJson(Map<String, dynamic> json) => _$DataFromJson(json);
+  factory EpisodeData.fromJson(Map<String, dynamic> json) =>
+      _$EpisodeDataFromJson(json);
 
-  Map<String, dynamic> toJson() => _$DataToJson(this);
+  Map<String, dynamic> toJson() => _$EpisodeDataToJson(this);
 }
 
 /// 剧集搜索结果实体类
 @JsonSerializable()
 class Episode {
   /// 剧集列表
-  final List<Data>? data;
+  final List<EpisodeData>? data;
 
   /// 总剧集数
   final int? total;

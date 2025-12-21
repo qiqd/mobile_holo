@@ -105,7 +105,13 @@ class _HomeScreenState extends State<HomeScreen> {
                               : item.nameCn,
                           rating: item.rating?.score,
                           onTap: () {
-                            context.push('/detail', extra: item.id);
+                            context.push(
+                              '/detail',
+                              extra: {
+                                'id': item.id!,
+                                'keyword': item.nameCn ?? item.name ?? "",
+                              },
+                            );
                           },
                         );
                       },

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:mobile_mikufans/ui/screen/player.dart';
 
 class SetttingScreen extends StatefulWidget {
   const SetttingScreen({super.key});

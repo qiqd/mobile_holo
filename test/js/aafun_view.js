@@ -1,0 +1,18 @@
+var player_aaaa = {
+  flag: "play",
+  encrypt: 1,
+  trysee: 0,
+  points: 0,
+  link: "/f/7RCCCS-1-1.html",
+  link_next: "/f/7RCCCS-2-10.html",
+  link_pre: "/f/7RCCCS-2-8.html",
+  vod_data: { vod_name: "\u672a\u6765\u65e5\u8bb0", vod_actor: ",,", vod_director: "\u7d30\u7530\u76f4\u4eba", vod_class: "\u75c5\u5a07,\u672a\u6765\u65e5\u8bb0,\u6211\u59bb\u7531\u4e43,2011\u5e7410\u6708" },
+  url: "%6D%64%61%2D%71%69%73%6E%6D%67%33%7A%64%67%37%31%6B%72%70%36",
+  url_next: "%6D%64%61%2D%71%69%73%6E%6E%6A%7A%6E%65%72%64%68%72%77%35%78",
+  from: "Moe-B",
+  server: "no",
+  note: "",
+  id: "7RCCCS",
+  sid: 2,
+  nid: 9,
+}

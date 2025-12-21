@@ -1,7 +1,9 @@
 import 'package:mobile_mikufans/entity/calendar.dart';
 import 'package:mobile_mikufans/entity/character.dart';
+import 'package:mobile_mikufans/entity/episode.dart';
 import 'package:mobile_mikufans/entity/person.dart';
-import 'package:mobile_mikufans/entity/subject.dart';
+import 'package:mobile_mikufans/entity/subject.dart' show Data, Subject;
+
 import 'package:mobile_mikufans/entity/subject_relation.dart';
 
 abstract class MetaService {
@@ -40,6 +42,10 @@ abstract class MetaService {
   );
 
   Future<List<SubjectRelation>> fetchSubjectRelationSync(
+    int subjectId,
+    void Function(dynamic) exception,
+  );
+  Future<Episode?> fethcEpisodeSync(
     int subjectId,
     void Function(dynamic) exception,
   );

@@ -1,5 +1,6 @@
 import 'package:mobile_mikufans/entity/calendar.dart';
 import 'package:mobile_mikufans/entity/character.dart';
+import 'package:mobile_mikufans/entity/episode.dart' hide EpisodeData;
 import 'package:mobile_mikufans/entity/person.dart';
 import 'package:mobile_mikufans/entity/subject.dart';
 import 'package:mobile_mikufans/entity/subject_relation.dart';
@@ -161,6 +162,26 @@ class Bangumi implements MetaService {
       );
       if (response.data != null) {
         return Data.fromJson(response.data);
+      }
+      return null;
+    } catch (e) {
+      exception(e as Exception);
+      return null;
+    }
+  }
+
+  @override
+  Future<Episode?> fethcEpisodeSync(
+    int subjectId,
+    void Function(Exception) exception,
+  ) async {
+    try {
+      final response = await HttpUtil.createDio().get(
+        "$baseUrl/v0/episodes",
+        queryParameters: {"subject_id": subjectId},
+      );
+      if (response.data != null) {
+        return Episode.fromJson(response.data);
       }
       return null;
     } catch (e) {

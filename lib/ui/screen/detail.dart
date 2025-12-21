@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mobile_mikufans/entity/character.dart';
+import 'package:mobile_mikufans/entity/media.dart';
 import 'package:mobile_mikufans/entity/person.dart';
 import 'package:mobile_mikufans/entity/subject.dart' show Data;
 import 'package:mobile_mikufans/entity/subject_relation.dart';
@@ -9,8 +10,8 @@ import 'package:mobile_mikufans/ui/component/meida_card.dart';
 
 class DetailScreen extends StatefulWidget {
   final int id;
-
-  const DetailScreen({super.key, required this.id});
+  final String keyword;
+  const DetailScreen({super.key, required this.id, required this.keyword});
 
   @override
   State<DetailScreen> createState() => _DetailScreenState();
@@ -22,7 +23,7 @@ class _DetailScreenState extends State<DetailScreen>
   List<Person>? person;
   List<Character>? character;
   List<SubjectRelation>? relation;
-
+  List<List<MediaWithScore>> media = [];
   late TabController tabController = TabController(vsync: this, length: 4);
   String _msg = "";
   void _fetchSubjec() async {
@@ -33,6 +34,14 @@ class _DetailScreenState extends State<DetailScreen>
     });
     setState(() {
       data = res;
+    });
+  }
+
+  void _fetchMedia() async {
+    final res = await Api.aafun.fetchSearch(widget.keyword, 1, 10, (e) {
+      setState(() {
+        _msg = e.toString();
+      });
     });
   }
 

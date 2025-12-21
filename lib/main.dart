@@ -67,7 +67,13 @@ class _MyAppState extends State<MyApp> {
       ),
       GoRoute(
         path: '/detail',
-        builder: (context, state) => DetailScreen(id: state.extra as int),
+        builder: (context, state) {
+          final map = state.extra as Map<String, dynamic>;
+          return DetailScreen(
+            id: map['id'] as int,
+            keyword: map['keyword'] as String,
+          );
+        },
       ),
 
       GoRoute(path: '/player', builder: (context, state) => PlayerScreen()),

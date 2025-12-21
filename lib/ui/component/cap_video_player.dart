@@ -1,10 +1,13 @@
+import 'dart:async';
 import 'dart:developer';
 
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
+import 'package:screen_brightness/screen_brightness.dart';
+import 'package:simple_gesture_detector/simple_gesture_detector.dart';
 import 'package:video_player/video_player.dart';
+import 'package:volume_controller/volume_controller.dart';
 
 class CapVideoPlayer extends StatefulWidget {
   final VideoPlayerController controller;
@@ -28,6 +31,8 @@ class _CapVideoPlayerState extends State<CapVideoPlayer> {
   late bool _isFullScreen = widget.isFullScreen;
   late final String title = widget.title ?? "暂无标题";
   late final VideoPlayerController player = widget.controller;
+  late final VolumeController volumeController;
+  late final ScreenBrightness brightnessController;
   double videoDuration = 0.0;
   double videoPosition = 0.0;
   double bufferedEnd = 0.0;
@@ -36,9 +41,26 @@ class _CapVideoPlayerState extends State<CapVideoPlayer> {
   bool isBuffering = false;
   String msgText = '';
   bool showMsg = false;
-  Duration? _dragStartPosition;
-  double _totalDragOffset = 0.0;
+  bool showVideoControls = true;
   bool isForward = true;
+  int jumpMs = 0;
+  int dragOffset = 0;
+
+  Timer? _timer;
+  Timer? _videoControlsTimer;
+  Timer? _videoTimer;
+  void _showVideoControlsTimer() {
+    log("showVideoControlsTimer");
+    _videoControlsTimer?.cancel();
+    _videoControlsTimer = Timer(Duration(seconds: 5), () {
+      if (mounted) {
+        setState(() {
+          showVideoControls = false;
+        });
+      }
+    });
+  }
+
   void _toggleFullScreen() async {
     if (_isFullScreen) {
       await SystemChrome.setPreferredOrientations([
@@ -55,57 +77,6 @@ class _CapVideoPlayerState extends State<CapVideoPlayer> {
       await SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
     }
     widget.onFullScreenChanged?.call(_isFullScreen);
-  }
-
-  void _handleHorizontalDragStart(DragStartDetails details) {
-    _dragStartPosition = player.value.position;
-    _totalDragOffset = 0.0;
-    setState(() {
-      showMsg = true;
-    });
-  }
-
-  void _handleHorizontalDragUpdate(DragUpdateDetails details) {
-    _totalDragOffset += details.delta.dx;
-    setState(() {
-      isForward = details.delta.dx > 0;
-    });
-    final RenderBox box = context.findRenderObject() as RenderBox;
-    final width = box.size.width;
-    final jumpMs = (_totalDragOffset / width * 90 * 1000).round();
-
-    String direction = jumpMs > 0 ? '快进' : '快退';
-    int absSeconds = (jumpMs.abs() / 1000).round();
-
-    setState(() {
-      msgText = '$direction ${absSeconds}s';
-    });
-  }
-
-  // 结束拖动：执行 seek 并隐藏提示
-  void _handleHorizontalDragEnd(DragEndDetails details) async {
-    if (_dragStartPosition == null) return;
-
-    final RenderBox box = context.findRenderObject() as RenderBox;
-    final width = box.size.width;
-
-    final jumpMs = (_totalDragOffset / width * 90 * 1000).round();
-    final newPosition = (_dragStartPosition!.inMilliseconds + jumpMs).clamp(
-      0,
-      player.value.duration.inMilliseconds,
-    );
-
-    await player.seekTo(Duration(milliseconds: newPosition));
-
-    // 隐藏提示
-    setState(() {
-      showMsg = false;
-      msgText = '';
-    });
-
-    // 清理状态
-    _dragStartPosition = null;
-    _totalDragOffset = 0.0;
   }
 
   void _addListener() {
@@ -139,10 +110,97 @@ class _CapVideoPlayerState extends State<CapVideoPlayer> {
     return maxEnd.inSeconds.toDouble();
   }
 
+  void _startOrRestartTimer() {
+    _timer?.cancel();
+    _timer = Timer(Duration(seconds: 5), () {
+      setState(() {
+        showMsg = false;
+      });
+    });
+  }
+
+  void _startOrRestartVideoTimer() {
+    setState(() {
+      showMsg = true;
+    });
+    _videoTimer?.cancel();
+    _videoTimer = Timer(Duration(milliseconds: 500), () {
+      player.seekTo(Duration(seconds: videoPosition.toInt() + dragOffset));
+      setState(() {
+        dragOffset = 0;
+        showMsg = false;
+      });
+    });
+  }
+
+  void decreaseBrightnessBy1Percent(SwipeDirection direction) async {
+    showMsg = true;
+    _startOrRestartTimer();
+    final current = await brightnessController.application;
+    double newBrightness = current;
+    if (direction == SwipeDirection.up) {
+      newBrightness = current + 0.01;
+    } else if (direction == SwipeDirection.down) {
+      newBrightness = current - 0.01;
+    }
+    log("set brightness to $newBrightness");
+    newBrightness = newBrightness.clamp(0.0, 1.0);
+    await ScreenBrightness.instance.setApplicationScreenBrightness(
+      newBrightness,
+    );
+    setState(() {
+      showMsg = true;
+      msgText = '亮度: ${(newBrightness * 100).toStringAsFixed(0)}%';
+    });
+  }
+
+  void decreaseVolumeBy1Percent(SwipeDirection direction) async {
+    showMsg = true;
+    _startOrRestartTimer();
+    final current = await volumeController.getVolume();
+    double newVolume = current;
+    if (direction == SwipeDirection.up) {
+      newVolume = current + 0.01;
+    } else if (direction == SwipeDirection.down) {
+      newVolume = current - 0.01;
+    }
+    log("set volume to $newVolume");
+    newVolume = newVolume.clamp(0.0, 1.0);
+    await VolumeController.instance.setVolume(newVolume);
+    setState(() {
+      showMsg = true;
+      msgText = '音量: ${(newVolume * 100).toStringAsFixed(0)}%';
+    });
+  }
+
+  void handleVideoProgressChange(SwipeDirection direction) {
+    log("handleVideoProgressChange $direction");
+    _startOrRestartVideoTimer();
+
+    if (direction == SwipeDirection.left) {
+      dragOffset -= 1;
+    } else if (direction == SwipeDirection.right) {
+      dragOffset += 1;
+    }
+
+    setState(() {
+      msgText = dragOffset < 0 ? "后退${dragOffset.abs()}秒" : "前进$dragOffset秒";
+    });
+  }
+
   @override
   void initState() {
     _addListener();
+    VolumeController.instance.showSystemUI = false;
+    brightnessController = ScreenBrightness.instance;
+    volumeController = VolumeController.instance;
     super.initState();
+  }
+
+  @override
+  void didChangeDependencies() {
+    _showVideoControlsTimer();
+    super.didChangeDependencies();
   }
 
   @override
@@ -161,147 +219,235 @@ class _CapVideoPlayerState extends State<CapVideoPlayer> {
       },
       child: Stack(
         children: [
-          player.value.isInitialized
+          player.value.isInitialized && !isBuffering
               ? VideoPlayer(player)
-              : SizedBox(child: Center(child: CircularProgressIndicator())),
-          if (showMsg) ...[
-            Align(
+              : Container(
+                  color: Colors.black,
+                  child: Center(child: CircularProgressIndicator()),
+                ),
+          AnimatedOpacity(
+            curve: showMsg ? Curves.decelerate : Curves.easeOutQuart,
+            opacity: showMsg ? 1.0 : 0.0,
+            duration: Duration(milliseconds: 300),
+            child: Align(
               alignment: Alignment.center,
               child: Text(msgText, style: TextStyle(color: Colors.white)),
             ),
-          ],
-          GestureDetector(
-            onHorizontalDragStart: _handleHorizontalDragStart,
-            onHorizontalDragUpdate: _handleHorizontalDragUpdate,
-            onHorizontalDragEnd: _handleHorizontalDragEnd,
-            onDoubleTap: () =>
-                player.value.isPlaying ? player.pause() : player.play(),
-
-            child: Container(color: Colors.transparent),
           ),
-
+          if (_isFullScreen && showVideoControls) ...[
+            Padding(
+              padding: EdgeInsets.only(top: 20),
+              child: Align(
+                alignment: Alignment.topCenter,
+                child: Text(
+                  "${DateTime.now().hour}:${DateTime.now().minute}",
+                  style: TextStyle(color: Colors.white),
+                ),
+              ),
+            ),
+          ],
           Column(
             children: [
-              Row(
-                children: [
-                  // 返回
-                  IconButton(
-                    icon: Icon(Icons.arrow_back_ios, color: Colors.white),
-                    onPressed: () {
-                      if (_isFullScreen) {
-                        setState(() {
-                          _isFullScreen = false;
-                        });
-                        _toggleFullScreen();
-                      } else {
-                        context.pop();
-                      }
-                    },
-                  ),
-                  // 标题
-                  Text(
-                    title,
-                    style: Theme.of(
-                      context,
-                    ).textTheme.titleLarge?.copyWith(color: Colors.white),
-                  ),
-                  Spacer(),
-                  _isFullScreen
-                      ? Text(
-                          "${DateTime.now().hour}:${DateTime.now().minute}",
-                          style: TextStyle(color: Colors.white),
-                        )
-                      : Container(),
-                ],
-              ),
-              Expanded(child: Container()),
-              // 进度条
-              Row(
-                children: [
-                  Expanded(
-                    child: Slider(
-                      secondaryTrackValue: getBufferedEnd(),
-                      value: widget.controller.value.position.inSeconds
-                          .toDouble(),
-                      max: widget.controller.value.duration.inSeconds
-                          .toDouble(),
-                      onChangeEnd: (value) {
-                        setState(() {
-                          widget.controller.seekTo(
-                            Duration(seconds: value.toInt()),
-                          );
-                          widget.controller.play();
-                        });
-                      },
-                      onChanged: (value) {
-                        // setState(() {
-                        //   widget.controller.seekTo(
-                        //     Duration(seconds: value.toInt()),
-                        //   );
-                        // });
-                      },
-                    ),
-                  ),
-                ],
-              ),
-              // 播放按钮
-              Row(
-                children: [
-                  IconButton(
-                    onPressed: () {
-                      if (widget.controller.value.isPlaying) {
-                        widget.controller.pause();
-                      } else {
-                        widget.controller.play();
-                      }
-                      setState(() {});
-                    },
-                    icon: Icon(
-                      widget.controller.value.isPlaying
-                          ? Icons.pause_rounded
-                          : Icons.play_arrow_rounded,
-                      color: Colors.white,
-                    ),
-                  ),
-                  // 下一集
-                  IconButton(
-                    onPressed: () {},
-                    icon: Icon(Icons.skip_next_rounded, color: Colors.white),
-                  ),
-                  if (!_isFullScreen) ...[
+              AnimatedOpacity(
+                opacity: showVideoControls ? 1.0 : 0.0,
+                duration: Duration(milliseconds: 300),
+                child: Row(
+                  children: [
+                    // 返回
                     IconButton(
-                      onPressed: () {},
-                      icon: Icon(
-                        Icons.format_list_bulleted_rounded,
-                        color: Colors.white,
-                      ),
+                      icon: Icon(Icons.arrow_back_ios, color: Colors.white),
+                      onPressed: () {
+                        if (_isFullScreen) {
+                          setState(() {
+                            _isFullScreen = false;
+                          });
+                          _toggleFullScreen();
+                        } else {
+                          context.pop();
+                        }
+                      },
+                    ),
+                    // 标题
+                    Text(
+                      title,
+                      style: Theme.of(
+                        context,
+                      ).textTheme.titleLarge?.copyWith(color: Colors.white),
                     ),
                   ],
-                  //进度
-                  Text(
-                    "${widget.controller.value.position.inMinutes}:${widget.controller.value.position.inSeconds.remainder(60)}",
-                    style: TextStyle(color: Colors.white),
-                  ),
-                  IconButton(
-                    onPressed: () {},
-                    icon: Text('弹', style: TextStyle(color: Colors.white)),
-                  ),
-                  Spacer(),
-                  IconButton(
-                    onPressed: () {
-                      setState(() {
-                        _isFullScreen = !_isFullScreen;
-                      });
-                      _toggleFullScreen();
+                ),
+              ),
+              Expanded(
+                child: SizedBox(
+                  child: SimpleGestureDetector(
+                    swipeConfig: SimpleSwipeConfig(
+                      horizontalThreshold: 5,
+                      swipeDetectionBehavior: SwipeDetectionBehavior.continuous,
+                    ),
+                    onTap: () => setState(() {
+                      _showVideoControlsTimer();
+                      showVideoControls = !showVideoControls;
+                    }),
+                    onDoubleTap: () {
+                      isPlaying ? player.pause() : player.play();
+                      _showVideoControlsTimer();
                     },
-                    icon: Icon(
-                      _isFullScreen
-                          ? Icons.fullscreen_exit_rounded
-                          : Icons.fullscreen_rounded,
-                      color: Colors.white,
+                    onHorizontalSwipe: (direction) =>
+                        handleVideoProgressChange(direction),
+                    child: Row(
+                      children: [
+                        Flexible(
+                          child: SimpleGestureDetector(
+                            swipeConfig: SimpleSwipeConfig(
+                              verticalThreshold: 1,
+                              horizontalThreshold: 9999,
+                              swipeDetectionBehavior:
+                                  SwipeDetectionBehavior.continuous,
+                            ),
+                            onVerticalSwipe: (direction) {
+                              if (direction == SwipeDirection.left ||
+                                  direction == SwipeDirection.right) {
+                                return;
+                              }
+                              decreaseBrightnessBy1Percent(direction);
+                            },
+
+                            child: Container(color: Colors.transparent),
+                          ),
+                        ),
+                        Flexible(
+                          child: SimpleGestureDetector(
+                            swipeConfig: SimpleSwipeConfig(
+                              verticalThreshold: 1,
+                              horizontalThreshold: 9999,
+                              swipeDetectionBehavior:
+                                  SwipeDetectionBehavior.continuous,
+                            ),
+                            onVerticalSwipe: (direction) {
+                              if (direction == SwipeDirection.left ||
+                                  direction == SwipeDirection.right) {
+                                return;
+                              }
+                              decreaseVolumeBy1Percent(direction);
+                            },
+
+                            child: Container(color: Colors.transparent),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                ],
+                ),
+              ),
+              AnimatedOpacity(
+                opacity: showVideoControls ? 1.0 : 0.0,
+                curve: Curves.easeInOut,
+                duration: Duration(milliseconds: 100),
+                child: Column(
+                  children: [
+                    // 进度条
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Slider(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 0,
+                            ),
+                            secondaryTrackValue: getBufferedEnd(),
+                            value: widget.controller.value.position.inSeconds
+                                .toDouble(),
+                            max: widget.controller.value.duration.inSeconds
+                                .toDouble(),
+                            onChangeEnd: (value) {
+                              _showVideoControlsTimer();
+                              setState(() {
+                                widget.controller.seekTo(
+                                  Duration(seconds: value.toInt()),
+                                );
+                                widget.controller.play();
+                              });
+                            },
+                            onChanged: (value) {},
+                          ),
+                        ),
+                      ],
+                    ),
+                    // 播放按钮
+                    Row(
+                      children: [
+                        IconButton(
+                          onPressed: () {
+                            _showVideoControlsTimer();
+                            if (widget.controller.value.isPlaying) {
+                              widget.controller.pause();
+                            } else {
+                              widget.controller.play();
+                            }
+                            setState(() {});
+                          },
+                          icon: Icon(
+                            widget.controller.value.isPlaying
+                                ? Icons.pause_rounded
+                                : Icons.play_arrow_rounded,
+                            color: Colors.white,
+                          ),
+                        ),
+                        // 下一集
+                        IconButton(
+                          onPressed: () {
+                            _showVideoControlsTimer();
+                          },
+                          icon: Icon(
+                            Icons.skip_next_rounded,
+                            color: Colors.white,
+                          ),
+                        ),
+                        if (!_isFullScreen) ...[
+                          IconButton(
+                            onPressed: () {
+                              _showVideoControlsTimer();
+                            },
+                            icon: Icon(
+                              Icons.format_list_bulleted_rounded,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ],
+                        //进度
+                        Text(
+                          "${widget.controller.value.position.inMinutes}:${widget.controller.value.position.inSeconds.remainder(60)}",
+                          style: TextStyle(color: Colors.white),
+                        ),
+                        IconButton(
+                          onPressed: () {
+                            _showVideoControlsTimer();
+                          },
+                          icon: Text(
+                            '弹',
+                            style: TextStyle(color: Colors.white),
+                          ),
+                        ),
+                        Spacer(),
+                        IconButton(
+                          onPressed: () {
+                            _showVideoControlsTimer();
+                            setState(() {
+                              _isFullScreen = !_isFullScreen;
+                            });
+                            _toggleFullScreen();
+                          },
+                          icon: Icon(
+                            _isFullScreen
+                                ? Icons.fullscreen_exit_rounded
+                                : Icons.fullscreen_rounded,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
             ],
           ),
