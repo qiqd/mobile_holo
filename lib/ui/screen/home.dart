@@ -61,6 +61,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     onSubmitted: (value) {
                       _fetchSearch(value, context);
                     },
+                    autofocus: false,
                     decoration: InputDecoration(
                       hintText: "搜索动漫、电影...",
                       hintStyle: TextStyle(color: Colors.grey[400]),

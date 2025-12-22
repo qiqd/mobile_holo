@@ -10,6 +10,7 @@ class MeidaCard extends StatelessWidget {
   final String? imageUrl;
   final double? rating;
   final double height;
+  final double score;
   final Function? onTap;
 
   const MeidaCard({
@@ -22,6 +23,7 @@ class MeidaCard extends StatelessWidget {
     this.episode,
     this.airDate,
     this.rating,
+    this.score = 0,
     this.height = 200,
     this.onTap,
   });
@@ -69,6 +71,7 @@ class MeidaCard extends StatelessWidget {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      // 中文名称
                       Text(
                         nameCn,
                         style: const TextStyle(
@@ -78,6 +81,7 @@ class MeidaCard extends StatelessWidget {
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                       ),
+                      // 初始名称
                       if (name != null && nameCn.isNotEmpty)
                         Text(
                           name ?? "",
@@ -85,11 +89,22 @@ class MeidaCard extends StatelessWidget {
                             color: Colors.grey,
                             fontSize: 14,
                           ),
-                          maxLines: 1,
+                          maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                         ),
                     ],
                   ),
+                  //匹配度
+                  if (score != 0)
+                    Text(
+                      "匹配度:${(score * 100).toStringAsFixed(1)}%",
+                      style: const TextStyle(
+                        color: Colors.orange,
+                        fontSize: 12,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
                   if (genre != null)
                     Text(
                       genre!,

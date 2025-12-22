@@ -11,6 +11,7 @@ Media _$MediaFromJson(Map<String, dynamic> json) => Media(
   title: json['title'] as String?,
   titleCn: json['title_cn'] as String?,
   coverUrl: json['coverUrl'] as String?,
+  score: json['source'] as double?,
 );
 
 Map<String, dynamic> _$MediaToJson(Media instance) => <String, dynamic>{
@@ -36,23 +37,12 @@ Detail _$DetailFromJson(Map<String, dynamic> json) => Detail(
   media: json['media'] == null
       ? null
       : Media.fromJson(json['media'] as Map<String, dynamic>),
-  sources: (json['sources'] as List<dynamic>?)
+  lines: (json['sources'] as List<dynamic>?)
       ?.map((e) => Line.fromJson(e as Map<String, dynamic>))
       .toList(),
 );
 
 Map<String, dynamic> _$DetailToJson(Detail instance) => <String, dynamic>{
   'media': instance.media,
-  'sources': instance.sources,
+  'sources': instance.lines,
 };
-
-MediaWithScore _$MediaWithScoreFromJson(Map<String, dynamic> json) =>
-    MediaWithScore(
-      media: json['media'] == null
-          ? null
-          : Media.fromJson(json['media'] as Map<String, dynamic>),
-      score: (json['score'] as num?)?.toDouble(),
-    );
-
-Map<String, dynamic> _$MediaWithScoreToJson(MediaWithScore instance) =>
-    <String, dynamic>{'media': instance.media, 'score': instance.score};

@@ -8,7 +8,11 @@ class Api {
   static Bangumi bangumi = Bangumi();
   static AAfun aafun = AAfun();
   static final List<SourceService> _sources = [AAfun()];
-  static List<SourceService> getSources() => _sources;
+  static List<SourceService> getSources() {
+    _sources.sort((a, b) => a.delay.compareTo(b.delay));
+    return _sources;
+  }
+
   static Future<void> delayTest() async {
     final futures = _sources.map((source) async {
       try {

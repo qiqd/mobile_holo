@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:mobile_mikufans/service/source_service.dart';
 
 import 'package:mobile_mikufans/service/util/store_util.dart';
 import 'package:mobile_mikufans/ui/screen/detail.dart';
@@ -76,7 +77,18 @@ class _MyAppState extends State<MyApp> {
         },
       ),
 
-      GoRoute(path: '/player', builder: (context, state) => PlayerScreen()),
+      GoRoute(
+        path: '/player',
+        builder: (context, state) {
+          final map = state.extra as Map<String, dynamic>;
+          return PlayerScreen(
+            mediaId: map['mediaId'] as String,
+            subjectId: map['subjectId'] as int,
+            source: map['source'] as SourceService,
+            nameCn: map['nameCn'] as String,
+          );
+        },
+      ),
     ],
   );
   @override

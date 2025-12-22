@@ -9,8 +9,12 @@ class Media {
   @JsonKey(name: 'title_cn')
   String? titleCn;
   String? coverUrl;
-  Media({this.id, this.title, this.titleCn, this.coverUrl});
+  double? score;
+
+  Media({this.id, this.title, this.titleCn, this.coverUrl, this.score = 0});
+
   factory Media.fromJson(Map<String, dynamic> json) => _$MediaFromJson(json);
+
   Map<String, dynamic> toJson() => _$MediaToJson(this);
 }
 
@@ -18,26 +22,22 @@ class Media {
 class Line {
   String? name;
   List<String>? episodes;
+
   Line({this.name, this.episodes});
+
   factory Line.fromJson(Map<String, dynamic> json) => _$LineFromJson(json);
+
   Map<String, dynamic> toJson() => _$LineToJson(this);
 }
 
 @JsonSerializable()
 class Detail {
   Media? media;
-  List<Line>? sources;
-  factory Detail.fromJson(Map<String, dynamic> json) => _$DetailFromJson(json);
-  Map<String, dynamic> toJson() => _$DetailToJson(this);
-  Detail({this.media, this.sources});
-}
+  List<Line>? lines;
 
-@JsonSerializable()
-class MediaWithScore {
-  Media? media;
-  double? score;
-  MediaWithScore({this.media, this.score});
-  factory MediaWithScore.fromJson(Map<String, dynamic> json) =>
-      _$MediaWithScoreFromJson(json);
-  Map<String, dynamic> toJson() => _$MediaWithScoreToJson(this);
+  factory Detail.fromJson(Map<String, dynamic> json) => _$DetailFromJson(json);
+
+  Map<String, dynamic> toJson() => _$DetailToJson(this);
+
+  Detail({this.media, this.lines});
 }

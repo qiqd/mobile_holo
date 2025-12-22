@@ -11,7 +11,7 @@ import 'package:mobile_mikufans/service/util/http_util.dart';
 
 class AAfun implements SourceService {
   @override
-  int delay = 999;
+  int delay = 9999;
   @override
   String getBaseUrl() {
     return "https://www.aafun.cc";
@@ -44,7 +44,7 @@ class AAfun implements SourceService {
           }).toList();
           return Line(episodes: episodes);
         }).toList();
-        return Detail(sources: sources);
+        return Detail(lines: sources);
       }
       return null;
     } catch (e) {
@@ -170,7 +170,7 @@ class AAfun implements SourceService {
         if (encryptedUrl != null && sessionKey != null) {
           try {
             final decryptedUrl = decryptAES(encryptedUrl, sessionKey);
-            return decryptedUrl;
+            return decryptedUrl.replaceFirst("http://", "https://");
           } catch (e) {
             log('解密失败: $e');
             return null;

@@ -1,16 +1,24 @@
+import 'dart:convert';
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:mobile_mikufans/entity/character.dart';
+import 'package:mobile_mikufans/entity/episode.dart';
 import 'package:mobile_mikufans/entity/media.dart';
 import 'package:mobile_mikufans/entity/person.dart';
 import 'package:mobile_mikufans/entity/subject.dart' show Data;
 import 'package:mobile_mikufans/entity/subject_relation.dart';
-
 import 'package:mobile_mikufans/service/api.dart';
+import 'package:mobile_mikufans/service/source_service.dart';
+import 'package:mobile_mikufans/service/util/jaro_winkler_similarity.dart';
+import 'package:mobile_mikufans/ui/component/loading_msg.dart';
 import 'package:mobile_mikufans/ui/component/meida_card.dart';
 
 class DetailScreen extends StatefulWidget {
   final int id;
   final String keyword;
+
   const DetailScreen({super.key, required this.id, required this.keyword});
 
   @override
@@ -19,13 +27,23 @@ class DetailScreen extends StatefulWidget {
 
 class _DetailScreenState extends State<DetailScreen>
     with TickerProviderStateMixin {
+  late String keyword = widget.keyword;
   Data? data;
   List<Person>? person;
   List<Character>? character;
   List<SubjectRelation>? relation;
-  List<List<MediaWithScore>> media = [];
+  Map<SourceService, List<Media>> source2Media = {};
+  List<SourceService> sourceService = [];
+  bool isLoading = false;
   late TabController tabController = TabController(vsync: this, length: 4);
+  late TabController subTabController = TabController(
+    vsync: this,
+    length: Api.getSources().length,
+  );
   String _msg = "";
+  Media? defaultMedia;
+
+  SourceService? defaultSource;
   void _fetchSubjec() async {
     final res = await Api.bangumi.fetchSubjectSync(widget.id, (e) {
       setState(() {
@@ -37,11 +55,34 @@ class _DetailScreenState extends State<DetailScreen>
     });
   }
 
-  void _fetchMedia() async {
-    final res = await Api.aafun.fetchSearch(widget.keyword, 1, 10, (e) {
-      setState(() {
-        _msg = e.toString();
-      });
+  Future<void> _fetchMedia() async {
+    setState(() {
+      isLoading = true;
+    });
+    final sources = Api.getSources();
+    final future = sources.map((source) async {
+      final res = await source.fetchSearch(keyword, 1, 10, (e) {});
+      source2Media[source] = res;
+    });
+    await Future.wait(future);
+    for (var value in source2Media.values) {
+      for (var m in value) {
+        m.score = JaroWinklerSimilarity.apply(widget.keyword, m.titleCn);
+      }
+    }
+    for (var value in source2Media.values) {
+      value.sort((a, b) => b.score!.compareTo(a.score!));
+    }
+    if (source2Media.values.isNotEmpty &&
+        source2Media.values.first.isNotEmpty) {
+      defaultMedia = source2Media.values.first.first;
+    }
+    final keys = source2Media.keys.toList();
+    keys.sort((a, b) => b.delay.compareTo(a.delay));
+    defaultSource = keys.first;
+    setState(() {
+      sourceService = keys;
+      isLoading = false;
     });
   }
 
@@ -80,17 +121,137 @@ class _DetailScreenState extends State<DetailScreen>
 
   @override
   void initState() {
+    super.initState();
     _fetchSubjec();
     _fetchPerson();
     _fetchCharacter();
     _fetchRelation();
-    super.initState();
+    _fetchMedia();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('详情')),
+      //浮动播放按钮
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          if (defaultMedia == null || defaultSource == null) {
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(SnackBar(content: Text('没有匹配到播放源,请点击右上角手动搜索')));
+            return;
+          }
+          context.push(
+            "/player",
+            extra: {
+              "mediaId": defaultMedia!.id!,
+              "subjectId": widget.id,
+              "source": defaultSource!,
+              "nameCn": defaultMedia!.titleCn!,
+            },
+          );
+        },
+        child: const Icon(Icons.play_arrow_rounded),
+      ),
+      appBar: AppBar(
+        title: const Text('详情'),
+        actions: [
+          IconButton(
+            onPressed: () {
+              if (isLoading) {
+                return;
+              }
+              showModalBottomSheet(
+                context: context,
+                builder: (context) {
+                  return StatefulBuilder(
+                    builder: (context, setState) {
+                      return Padding(
+                        padding: EdgeInsets.all(10),
+                        child: Column(
+                          children: [
+                            TextField(
+                              textInputAction: TextInputAction.search,
+                              decoration: const InputDecoration(
+                                hintText: '若搜索结果为空，请尝试输入其他关键词',
+                              ),
+                              onSubmitted: (value) async {
+                                setState(() {
+                                  keyword = value;
+                                  isLoading = true;
+                                });
+                                await _fetchMedia();
+                                setState(() {
+                                  isLoading = false;
+                                });
+                              },
+                            ),
+
+                            TabBar(
+                              isScrollable: true,
+                              controller: subTabController,
+                              tabs: sourceService
+                                  .map((e) => Tab(text: e.getName()))
+                                  .toList(),
+                            ),
+                            Expanded(
+                              child: source2Media.isEmpty
+                                  ? LoadingOrShowMsg(msg: "暂无搜索结果")
+                                  : TabBarView(
+                                      controller: subTabController,
+                                      children: sourceService.map((e) {
+                                        final item = source2Media[e] ?? [];
+                                        return isLoading
+                                            ? LoadingOrShowMsg(msg: _msg)
+                                            : ListView.builder(
+                                                itemCount: item.length,
+                                                itemBuilder: (context, index) {
+                                                  final m = item[index];
+                                                  return Column(
+                                                    children: [
+                                                      MeidaCard(
+                                                        id: 0,
+                                                        score: m.score ?? 0,
+                                                        imageUrl: m.coverUrl!,
+                                                        nameCn:
+                                                            m.titleCn ?? "暂无标题",
+                                                        name: m.title,
+                                                        height: 150,
+                                                        onTap: () {
+                                                          context.push(
+                                                            "/player",
+                                                            extra: {
+                                                              "mediaId": m.id!,
+                                                              "subjectId":
+                                                                  widget.id,
+                                                              "source": e,
+                                                              "nameCn":
+                                                                  m.titleCn!,
+                                                            },
+                                                          );
+                                                        },
+                                                      ),
+                                                      Divider(height: 5),
+                                                    ],
+                                                  );
+                                                },
+                                              );
+                                      }).toList(),
+                                    ),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  );
+                },
+              );
+            },
+            icon: Icon(Icons.search),
+          ),
+        ],
+      ),
+
       body: data == null
           ? Center(child: CircularProgressIndicator())
           : Padding(

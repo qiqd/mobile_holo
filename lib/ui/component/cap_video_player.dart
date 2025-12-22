@@ -11,16 +11,19 @@ import 'package:volume_controller/volume_controller.dart';
 
 class CapVideoPlayer extends StatefulWidget {
   final VideoPlayerController controller;
-
+  final bool isloading;
   final String? title;
   final bool isFullScreen;
   final Function(bool)? onFullScreenChanged;
+  final Function(String)? onError;
   const CapVideoPlayer({
     super.key,
     required this.controller,
+    required this.isloading,
     this.isFullScreen = false,
     this.title = "暂无标题",
     this.onFullScreenChanged,
+    this.onError,
   });
 
   @override
@@ -82,7 +85,8 @@ class _CapVideoPlayerState extends State<CapVideoPlayer> {
   void _addListener() {
     player.addListener(() {
       if (player.value.hasError) {
-        print("播放器发生错误: ${player.value.errorDescription}");
+        log("播放器发生错误: ${player.value.errorDescription}");
+        widget.onError?.call(player.value.errorDescription ?? "");
       }
       if (mounted) {
         setState(() {
@@ -219,7 +223,7 @@ class _CapVideoPlayerState extends State<CapVideoPlayer> {
       },
       child: Stack(
         children: [
-          player.value.isInitialized && !isBuffering
+          !isBuffering && !widget.isloading
               ? VideoPlayer(player)
               : Container(
                   color: Colors.black,
