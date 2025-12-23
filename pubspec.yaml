@@ -104,6 +104,7 @@ flutter:
 package_rename_config:
   android:
     app_name: "Holo" # Display name
+    bundle_name: "Holo" # Bundle name
     package_name: "com.github.qiqd.holo" # Package name
     # override_old_package: "com.example.mobile_mikufans" # Optional: Cleans up old folder structure
     # lang: "kotlin" # Optional: "kotlin" (default) or "java"
