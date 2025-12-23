@@ -46,6 +46,8 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        animateColor: true,
+        surfaceTintColor: Colors.red,
         title: SizedBox(
           child: Row(
             children: [

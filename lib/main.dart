@@ -5,7 +5,7 @@ import 'package:mobile_holo/service/source_service.dart';
 import 'package:mobile_holo/service/util/store_util.dart';
 import 'package:mobile_holo/ui/screen/calendar.dart';
 import 'package:mobile_holo/ui/screen/detail.dart';
-import 'package:mobile_holo/ui/screen/history.dart';
+
 import 'package:mobile_holo/ui/screen/home.dart';
 import 'package:mobile_holo/ui/screen/player.dart';
 

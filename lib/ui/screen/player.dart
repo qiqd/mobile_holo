@@ -269,7 +269,10 @@ class _PlayerScreenState extends State<PlayerScreen>
                               Padding(
                                 padding: EdgeInsets.only(right: 20),
                                 child: PopupMenuButton(
-                                  child: Text('路线选择'),
+                                  child: TextButton.icon(
+                                    onPressed: null,
+                                    label: Text('路线选择'),
+                                  ),
                                   itemBuilder: (context) => [
                                     ...List.generate(
                                       _detail?.lines?.length ?? 1,
@@ -294,43 +297,43 @@ class _PlayerScreenState extends State<PlayerScreen>
                             child: TabBarView(
                               controller: _tabController,
                               children: [
-                                Container(),
-                                Container(
-                                  child: ListView.builder(
-                                    padding: EdgeInsets.symmetric(
-                                      horizontal: 12,
-                                    ),
-                                    itemCount: _episode?.data?.length ?? 0,
-                                    itemBuilder: (itemBuilder, index) {
-                                      return Column(
-                                        children: [
-                                          ListTile(
-                                            shape: RoundedRectangleBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(8),
+                                Container(child: Center(child: Text("暂无评论"))),
+                                _episode == null
+                                    ? LoadingOrShowMsg(msg: msg)
+                                    : GridView.builder(
+                                        padding: EdgeInsets.all(10),
+                                        itemCount: _episode?.data?.length ?? 0,
+                                        gridDelegate:
+                                            SliverGridDelegateWithFixedCrossAxisCount(
+                                              crossAxisCount: 3,
+                                              mainAxisSpacing: 5,
+                                              crossAxisSpacing: 5,
                                             ),
-                                            selected: episodeIndex == index,
-                                            onTap: () {
-                                              if (episodeIndex == index ||
-                                                  isloading) {
-                                                return;
-                                              }
-                                              _onEpisodeSelected(index);
-                                            },
-                                            subtitle: Text(
-                                              maxLines: 2,
-                                              overflow: TextOverflow.ellipsis,
-                                              _episode?.data?[index].nameCn ??
-                                                  "暂无剧集名称",
+                                        itemBuilder: (context, index) =>
+                                            ListTile(
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(8),
+                                              ),
+                                              selected: episodeIndex == index,
+                                              onTap: () {
+                                                if (episodeIndex == index ||
+                                                    isloading) {
+                                                  return;
+                                                }
+                                                _onEpisodeSelected(index);
+                                              },
+                                              subtitle: Text(
+                                                maxLines: 5,
+                                                overflow: TextOverflow.ellipsis,
+                                                _episode?.data?[index].nameCn ??
+                                                    "暂无剧集名称",
+                                              ),
+                                              title: Text(
+                                                (index + 1).toString(),
+                                              ),
                                             ),
-                                            title: Text((index + 1).toString()),
-                                          ),
-                                          Divider(height: 6),
-                                        ],
-                                      );
-                                    },
-                                  ),
-                                ),
+                                      ),
                               ],
                             ),
                           ),

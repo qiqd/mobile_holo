@@ -22,7 +22,9 @@ class Bangumi implements MetaService {
     void Function(Exception) exception,
   ) async {
     try {
-      final response = await HttpUtil.createDio().get("$baseUrl/calendar");
+      final response = await HttpUtil.createDioWithUserAgent().get(
+        "$baseUrl/calendar",
+      );
       if (response.data != null) {
         var data = response.data as List<dynamic>;
         return data.map((e) => Calendar.fromJson(e)).toList();
@@ -40,7 +42,7 @@ class Bangumi implements MetaService {
     void Function(Exception) exception,
   ) async {
     try {
-      final response = await HttpUtil.createDio().get(
+      final response = await HttpUtil.createDioWithUserAgent().get(
         "$baseUrl/v0/subjects/$subjectId/characters",
       );
       if (response.data != null) {
@@ -60,7 +62,7 @@ class Bangumi implements MetaService {
     void Function(Exception) exception,
   ) async {
     try {
-      final response = await HttpUtil.createDio().get(
+      final response = await HttpUtil.createDioWithUserAgent().get(
         "$baseUrl/v0/subjects/$subjectId/persons",
       );
       if (response.data != null) {
@@ -89,7 +91,7 @@ class Bangumi implements MetaService {
       "year": DateTime.now().year,
     });
     try {
-      final response = await HttpUtil.createDio().get(
+      final response = await HttpUtil.createDioWithUserAgent().get(
         "$baseUrl/v0/subjects",
         queryParameters: Map.from(param),
       );
@@ -108,7 +110,7 @@ class Bangumi implements MetaService {
     String keyword,
     void Function(dynamic) exception,
   ) async {
-    var dio = HttpUtil.createDio();
+    var dio = HttpUtil.createDioWithUserAgent();
     try {
       final response = await dio.post(
         "$baseUrl/v0/search/subjects",
@@ -137,7 +139,7 @@ class Bangumi implements MetaService {
     void Function(Exception) exception,
   ) async {
     try {
-      final response = await HttpUtil.createDio().get(
+      final response = await HttpUtil.createDioWithUserAgent().get(
         "$baseUrl/v0/subjects/$subjectId/subjects",
       );
       if (response.data != null) {
@@ -157,7 +159,7 @@ class Bangumi implements MetaService {
     void Function(Exception) exception,
   ) async {
     try {
-      final response = await HttpUtil.createDio().get(
+      final response = await HttpUtil.createDioWithUserAgent().get(
         "$baseUrl/v0/subjects/$subjectId",
       );
       if (response.data != null) {
@@ -176,7 +178,7 @@ class Bangumi implements MetaService {
     void Function(Exception) exception,
   ) async {
     try {
-      final response = await HttpUtil.createDio().get(
+      final response = await HttpUtil.createDioWithUserAgent().get(
         "$baseUrl/v0/episodes",
         queryParameters: {"subject_id": subjectId},
       );

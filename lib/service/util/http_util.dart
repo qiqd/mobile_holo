@@ -34,6 +34,22 @@ class HttpUtil {
     return dio;
   }
 
+  static Dio createDioWithUserAgent() {
+    final dio = Dio();
+    // 基础配置
+    dio.options
+      ..headers = {
+        'User-Agent':
+            "mobile_holo/v1.0.0 (Android,IOS)(https://github.com/qiqd/mobile_holo)",
+        'Accept': '*/*',
+      }
+      ..connectTimeout = const Duration(seconds: 20)
+      ..receiveTimeout = const Duration(seconds: 20)
+      ..sendTimeout = const Duration(seconds: 20);
+
+    return dio;
+  }
+
   /// 创建带Referer的配置好的Dio实例
   ///
   /// @param url 请求URL
