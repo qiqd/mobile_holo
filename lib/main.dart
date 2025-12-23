@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:mobile_mikufans/service/source_service.dart';
+import 'package:mobile_holo/service/source_service.dart';
 
-import 'package:mobile_mikufans/service/util/store_util.dart';
-import 'package:mobile_mikufans/ui/screen/calendar.dart';
-import 'package:mobile_mikufans/ui/screen/detail.dart';
-import 'package:mobile_mikufans/ui/screen/history.dart';
-import 'package:mobile_mikufans/ui/screen/home.dart';
-import 'package:mobile_mikufans/ui/screen/player.dart';
+import 'package:mobile_holo/service/util/store_util.dart';
+import 'package:mobile_holo/ui/screen/calendar.dart';
+import 'package:mobile_holo/ui/screen/detail.dart';
+import 'package:mobile_holo/ui/screen/history.dart';
+import 'package:mobile_holo/ui/screen/home.dart';
+import 'package:mobile_holo/ui/screen/player.dart';
 
-import 'package:mobile_mikufans/ui/screen/setting.dart';
-import 'package:mobile_mikufans/ui/screen/subscribe.dart';
+import 'package:mobile_holo/ui/screen/setting.dart';
+import 'package:mobile_holo/ui/screen/subscribe.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

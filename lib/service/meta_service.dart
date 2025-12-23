@@ -1,10 +1,10 @@
-import 'package:mobile_mikufans/entity/calendar.dart';
-import 'package:mobile_mikufans/entity/character.dart';
-import 'package:mobile_mikufans/entity/episode.dart';
-import 'package:mobile_mikufans/entity/person.dart';
-import 'package:mobile_mikufans/entity/subject.dart' show Data, Subject;
+import 'package:mobile_holo/entity/calendar.dart';
+import 'package:mobile_holo/entity/character.dart';
+import 'package:mobile_holo/entity/episode.dart';
+import 'package:mobile_holo/entity/person.dart';
+import 'package:mobile_holo/entity/subject.dart' show Data, Subject;
 
-import 'package:mobile_mikufans/entity/subject_relation.dart';
+import 'package:mobile_holo/entity/subject_relation.dart';
 
 abstract class MetaService {
   String get name;

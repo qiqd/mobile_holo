@@ -4,7 +4,7 @@
  
 <!-- <uses-permission android:name="android.permission.WRITE_SETTINGS" tools:ignore="ProtectedPermissions"/> -->
     <application
-        android:label="mobile_mikufans"
+        android:label="Holo"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

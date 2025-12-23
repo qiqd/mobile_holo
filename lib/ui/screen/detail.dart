@@ -3,17 +3,17 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:mobile_mikufans/entity/character.dart';
-import 'package:mobile_mikufans/entity/episode.dart';
-import 'package:mobile_mikufans/entity/media.dart';
-import 'package:mobile_mikufans/entity/person.dart';
-import 'package:mobile_mikufans/entity/subject.dart' show Data;
-import 'package:mobile_mikufans/entity/subject_relation.dart';
-import 'package:mobile_mikufans/service/api.dart';
-import 'package:mobile_mikufans/service/source_service.dart';
-import 'package:mobile_mikufans/service/util/jaro_winkler_similarity.dart';
-import 'package:mobile_mikufans/ui/component/loading_msg.dart';
-import 'package:mobile_mikufans/ui/component/meida_card.dart';
+import 'package:mobile_holo/entity/character.dart';
+import 'package:mobile_holo/entity/episode.dart';
+import 'package:mobile_holo/entity/media.dart';
+import 'package:mobile_holo/entity/person.dart';
+import 'package:mobile_holo/entity/subject.dart' show Data;
+import 'package:mobile_holo/entity/subject_relation.dart';
+import 'package:mobile_holo/service/api.dart';
+import 'package:mobile_holo/service/source_service.dart';
+import 'package:mobile_holo/service/util/jaro_winkler_similarity.dart';
+import 'package:mobile_holo/ui/component/loading_msg.dart';
+import 'package:mobile_holo/ui/component/meida_card.dart';
 
 class DetailScreen extends StatefulWidget {
   final int id;

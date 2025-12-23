@@ -1,6 +1,6 @@
 import 'dart:core';
 
-import 'package:mobile_mikufans/entity/media.dart';
+import 'package:mobile_holo/entity/media.dart';
 
 // HtmlParser 抽象类定义
 abstract class SourceService {

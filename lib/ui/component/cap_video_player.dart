@@ -4,7 +4,7 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
-import 'package:mobile_mikufans/ui/component/loading_msg.dart';
+import 'package:mobile_holo/ui/component/loading_msg.dart';
 import 'package:screen_brightness/screen_brightness.dart';
 import 'package:simple_gesture_detector/simple_gesture_detector.dart';
 import 'package:video_player/video_player.dart';

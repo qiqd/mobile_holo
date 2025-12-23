@@ -1,11 +1,11 @@
-import 'package:mobile_mikufans/entity/calendar.dart';
-import 'package:mobile_mikufans/entity/character.dart';
-import 'package:mobile_mikufans/entity/episode.dart' hide EpisodeData;
-import 'package:mobile_mikufans/entity/person.dart';
-import 'package:mobile_mikufans/entity/subject.dart';
-import 'package:mobile_mikufans/entity/subject_relation.dart';
-import 'package:mobile_mikufans/service/meta_service.dart';
-import 'package:mobile_mikufans/service/util/http_util.dart';
+import 'package:mobile_holo/entity/calendar.dart';
+import 'package:mobile_holo/entity/character.dart';
+import 'package:mobile_holo/entity/episode.dart' hide EpisodeData;
+import 'package:mobile_holo/entity/person.dart';
+import 'package:mobile_holo/entity/subject.dart';
+import 'package:mobile_holo/entity/subject_relation.dart';
+import 'package:mobile_holo/service/meta_service.dart';
+import 'package:mobile_holo/service/util/http_util.dart';
 
 class Bangumi implements MetaService {
   @override

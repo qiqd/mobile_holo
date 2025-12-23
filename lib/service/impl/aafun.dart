@@ -5,9 +5,9 @@ import 'package:dio/dio.dart';
 import 'package:encrypt/encrypt.dart';
 
 import 'package:html/parser.dart';
-import 'package:mobile_mikufans/entity/media.dart';
-import 'package:mobile_mikufans/service/source_service.dart';
-import 'package:mobile_mikufans/service/util/http_util.dart';
+import 'package:mobile_holo/entity/media.dart';
+import 'package:mobile_holo/service/source_service.dart';
+import 'package:mobile_holo/service/util/http_util.dart';
 
 class AAfun implements SourceService {
   @override

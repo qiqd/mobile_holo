@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mobile_mikufans/service/impl/bangumi.dart';
+import 'package:mobile_holo/service/impl/bangumi.dart';
 
 void main() {
   var bangumi = Bangumi();
