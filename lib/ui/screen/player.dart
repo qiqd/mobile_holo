@@ -3,11 +3,13 @@ import 'dart:developer' show log;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:mobile_holo/entity/episode.dart';
+import 'package:mobile_holo/entity/history.dart';
 import 'package:mobile_holo/entity/media.dart';
 import 'package:mobile_holo/entity/subject.dart';
 import 'package:mobile_holo/service/api.dart';
 import 'package:mobile_holo/service/source_service.dart';
 import 'package:mobile_holo/service/util/jaro_winkler_similarity.dart';
+import 'package:mobile_holo/service/util/local_store.dart';
 import 'package:mobile_holo/ui/component/cap_video_player.dart';
 import 'package:mobile_holo/ui/component/loading_msg.dart';
 
@@ -15,13 +17,13 @@ import 'package:video_player/video_player.dart';
 
 class PlayerScreen extends StatefulWidget {
   final String mediaId;
-  final int subjectId;
+  final Data subject;
   final SourceService source;
   final String nameCn;
   const PlayerScreen({
     super.key,
     required this.mediaId,
-    required this.subjectId,
+    required this.subject,
     required this.source,
     required this.nameCn,
   });
@@ -123,6 +125,16 @@ class _PlayerScreenState extends State<PlayerScreen>
     _fetchViewInfo();
   }
 
+  void _loadHistory() async {
+    final history = LocalStore.getHistoryById(widget.subject.id!);
+    if (history != null) {
+      setState(() {
+        episodeIndex = history.episodeIndex;
+        lineIndex = history.lineIndex;
+      });
+    }
+  }
+
   void _fetchEpisode() async {
     final newSubject = await Api.bangumi.fetchSearchSync(nameCn, (e) {
       log("fetchSearchSync error: $e");
@@ -152,11 +164,26 @@ class _PlayerScreenState extends State<PlayerScreen>
     });
   }
 
+  void _storeLocalHistory() {
+    History history = History(
+      id: widget.subject.id!,
+      title: nameCn,
+      episodeIndex: episodeIndex,
+      lineIndex: lineIndex,
+      lastViewAt: DateTime.now(),
+      position: _controller?.value.position.inSeconds ?? 0,
+      imgUrl: widget.subject.images?.large ?? "",
+      isLove: false,
+    );
+    LocalStore.addHistory(history);
+  }
+
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     super.didChangeAppLifecycleState(state);
     if (state == AppLifecycleState.paused) {
       log("pause");
+      _storeLocalHistory();
     } else if (state == AppLifecycleState.resumed) {
       log("resume");
     }
@@ -165,6 +192,7 @@ class _PlayerScreenState extends State<PlayerScreen>
   @override
   void initState() {
     WidgetsBinding.instance.addObserver(this);
+    _loadHistory();
     _fetchEpisode();
     _fetchMediaEpisode().then((value) => _fetchViewInfo());
     super.initState();
@@ -173,6 +201,7 @@ class _PlayerScreenState extends State<PlayerScreen>
   @override
   void dispose() {
     _controller?.dispose();
+    _storeLocalHistory();
     SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
@@ -337,7 +366,7 @@ class _PlayerScreenState extends State<PlayerScreen>
                                                 _onEpisodeSelected(index);
                                               },
                                               subtitle: Text(
-                                                maxLines: 5,
+                                                maxLines: 4,
                                                 overflow: TextOverflow.ellipsis,
                                                 _episode?.data?[index].nameCn ??
                                                     "暂无剧集名称",

@@ -1,4 +1,8 @@
 import 'package:mobile_holo/service/impl/animation/aafun.dart';
+import 'package:mobile_holo/service/impl/animation/girugiru.dart';
+import 'package:mobile_holo/service/impl/animation/mengdao.dart';
+import 'package:mobile_holo/service/impl/animation/mwcy.dart';
+import 'package:mobile_holo/service/impl/animation/senfen.dart';
 import 'package:mobile_holo/service/impl/meta/bangumi.dart';
 import 'package:mobile_holo/service/source_service.dart';
 import 'package:mobile_holo/service/util/dio_timing_extension.dart';
@@ -7,7 +11,13 @@ import 'package:mobile_holo/service/util/http_util.dart';
 class Api {
   static Bangumi bangumi = Bangumi();
   static AAfun aafun = AAfun();
-  static final List<SourceService> _sources = [AAfun()];
+  static final List<SourceService> _sources = [
+    AAfun(),
+    Senfen(),
+    Girugiru(),
+    Mwcy(),
+    Mengdao(),
+  ];
   static List<SourceService> getSources() {
     _sources.sort((a, b) => a.delay.compareTo(b.delay));
     return _sources;

@@ -267,11 +267,15 @@ class _CapVideoPlayerState extends State<CapVideoPlayer> {
                         },
                       ),
                       // 标题
-                      Text(
-                        title,
-                        style: Theme.of(
-                          context,
-                        ).textTheme.titleLarge?.copyWith(color: Colors.white),
+                      Expanded(
+                        child: Text(
+                          title,
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 1,
+                          style: Theme.of(
+                            context,
+                          ).textTheme.titleLarge?.copyWith(color: Colors.white),
+                        ),
                       ),
                     ],
                   ),
@@ -318,7 +322,7 @@ class _CapVideoPlayerState extends State<CapVideoPlayer> {
                         Flexible(
                           child: SimpleGestureDetector(
                             swipeConfig: SimpleSwipeConfig(
-                              verticalThreshold: 50,
+                              verticalThreshold: 1,
                               horizontalThreshold: 9999,
                               swipeDetectionBehavior:
                                   SwipeDetectionBehavior.continuous,
@@ -420,9 +424,10 @@ class _CapVideoPlayerState extends State<CapVideoPlayer> {
                           ],
                           //进度
                           Text(
-                            "${widget.controller.value.position.inMinutes}:${widget.controller.value.position.inSeconds.remainder(60)}",
+                            "${widget.controller.value.position.inMinutes}:${widget.controller.value.position.inSeconds.remainder(60)}/${widget.controller.value.duration.inMinutes}:${widget.controller.value.duration.inSeconds.remainder(60)}",
                             style: TextStyle(color: Colors.white),
                           ),
+
                           Padding(
                             padding: EdgeInsets.only(left: 10),
                             child: PopupMenuButton(

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mobile_holo/service/util/datetime_util.dart';
 
 class MeidaCard extends StatelessWidget {
   final int id;
@@ -6,6 +7,8 @@ class MeidaCard extends StatelessWidget {
   final String nameCn;
   final String? genre;
   final int? episode;
+  final int? historyEpisode;
+  final DateTime? lastViewAt;
   final String? airDate;
   final String? imageUrl;
   final double? rating;
@@ -18,6 +21,8 @@ class MeidaCard extends StatelessWidget {
     required this.id,
     required this.imageUrl,
     required this.nameCn,
+    this.historyEpisode,
+    this.lastViewAt,
     this.name,
     this.genre,
     this.episode,
@@ -113,6 +118,7 @@ class MeidaCard extends StatelessWidget {
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     ),
+                  // 集数和上映时间
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -134,6 +140,7 @@ class MeidaCard extends StatelessWidget {
                         ),
                     ],
                   ),
+                  //评分
                   if (rating != null)
                     Row(
                       children: [
@@ -144,6 +151,18 @@ class MeidaCard extends StatelessWidget {
                           style: const TextStyle(fontWeight: FontWeight.bold),
                         ),
                       ],
+                    ),
+
+                  // 历史集数
+                  if (historyEpisode != null)
+                    Text(
+                      '观看至第 ${historyEpisode! + 1} 集',
+                      style: const TextStyle(color: Colors.grey, fontSize: 12),
+                    ),
+                  if (lastViewAt != null)
+                    Text(
+                      '上次观看时间: ${formatTimeAgo(lastViewAt!)}',
+                      style: const TextStyle(color: Colors.grey, fontSize: 12),
                     ),
                 ],
               ),

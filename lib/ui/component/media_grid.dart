@@ -7,12 +7,14 @@ class MediaGrid extends StatelessWidget {
   final String? title;
   final double? rating;
   final Function? onTap;
+  final bool showRating;
   const MediaGrid({
     super.key,
     required this.id,
     this.imageUrl,
     this.title,
     this.rating = 0,
+    this.showRating = true,
     this.onTap,
   });
 
@@ -40,7 +42,7 @@ class MediaGrid extends StatelessWidget {
                     errorWidget: (context, url, error) => Icon(Icons.error),
                   ),
                 ),
-                if (rating != null)
+                if (rating != null && showRating)
                   Positioned(
                     right: 4,
                     top: 4,

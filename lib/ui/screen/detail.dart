@@ -1,10 +1,7 @@
-import 'dart:convert';
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mobile_holo/entity/character.dart';
-import 'package:mobile_holo/entity/episode.dart';
+import 'package:mobile_holo/entity/history.dart';
 import 'package:mobile_holo/entity/media.dart';
 import 'package:mobile_holo/entity/person.dart';
 import 'package:mobile_holo/entity/subject.dart' show Data;
@@ -12,6 +9,7 @@ import 'package:mobile_holo/entity/subject_relation.dart';
 import 'package:mobile_holo/service/api.dart';
 import 'package:mobile_holo/service/source_service.dart';
 import 'package:mobile_holo/service/util/jaro_winkler_similarity.dart';
+import 'package:mobile_holo/service/util/local_store.dart';
 import 'package:mobile_holo/ui/component/loading_msg.dart';
 import 'package:mobile_holo/ui/component/meida_card.dart';
 
@@ -53,6 +51,7 @@ class _DetailScreenState extends State<DetailScreen>
     });
     setState(() {
       data = res;
+      _loadHistory();
     });
   }
 
@@ -81,10 +80,12 @@ class _DetailScreenState extends State<DetailScreen>
     final keys = source2Media.keys.toList();
     keys.sort((a, b) => b.delay.compareTo(a.delay));
     defaultSource = keys.first;
-    setState(() {
-      sourceService = keys;
-      isLoading = false;
-    });
+    if (mounted) {
+      setState(() {
+        sourceService = keys;
+        isLoading = false;
+      });
+    }
   }
 
   void _fetchPerson() async {
@@ -120,9 +121,30 @@ class _DetailScreenState extends State<DetailScreen>
     });
   }
 
-  void subscribeHandle() async {
-    //todo 订阅处理
+  void _loadHistory() {
+    final loved = LocalStore.getHistoryById(data!.id!)?.isLove ?? false;
+    setState(() {
+      isSubscribed = loved;
+    });
   }
+
+  void _storeLocalHistory() {
+    History history = History(
+      id: data!.id!,
+      title: data!.nameCn!,
+      imgUrl: data!.images?.large ?? "",
+      isLove: isSubscribed,
+    );
+    LocalStore.addHistory(history);
+  }
+
+  void subscribeHandle() async {
+    setState(() {
+      isSubscribed = !isSubscribed;
+    });
+    _storeLocalHistory();
+  }
+
   @override
   void initState() {
     super.initState();
@@ -149,7 +171,7 @@ class _DetailScreenState extends State<DetailScreen>
             "/player",
             extra: {
               "mediaId": defaultMedia!.id!,
-              "subjectId": widget.id,
+              "subject": data!,
               "source": defaultSource!,
               "nameCn": defaultMedia!.title!,
             },
@@ -168,9 +190,10 @@ class _DetailScreenState extends State<DetailScreen>
         actions: [
           IconButton(
             onPressed: () {
-              setState(() {
-                isSubscribed = !isSubscribed;
-              });
+              if (data == null) {
+                return;
+              }
+              subscribeHandle();
             },
             icon: Icon(
               isSubscribed
@@ -244,8 +267,7 @@ class _DetailScreenState extends State<DetailScreen>
                                                             "/player",
                                                             extra: {
                                                               "mediaId": m.id!,
-                                                              "subjectId":
-                                                                  widget.id,
+                                                              "subject": data,
                                                               "source": e,
                                                               "nameCn":
                                                                   m.title ??

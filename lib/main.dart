@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:mobile_holo/entity/subject.dart' show Data;
+import 'package:mobile_holo/service/api.dart';
 import 'package:mobile_holo/service/source_service.dart';
+import 'package:mobile_holo/service/util/local_store.dart';
 
-import 'package:mobile_holo/service/util/store_util.dart';
 import 'package:mobile_holo/ui/screen/calendar.dart';
 import 'package:mobile_holo/ui/screen/detail.dart';
 
@@ -14,7 +16,7 @@ import 'package:mobile_holo/ui/screen/subscribe.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Store.init();
+  await LocalStore.init();
   runApp(const MyApp());
 }
 
@@ -84,7 +86,7 @@ class _MyAppState extends State<MyApp> {
           final map = state.extra as Map<String, dynamic>;
           return PlayerScreen(
             mediaId: map['mediaId'] as String,
-            subjectId: map['subjectId'] as int,
+            subject: map['subject'] as Data,
             source: map['source'] as SourceService,
             nameCn: map['nameCn'] as String,
           );
@@ -92,6 +94,16 @@ class _MyAppState extends State<MyApp> {
       ),
     ],
   );
+  void initSource() async {
+    await Api.delayTest();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    initSource();
+  }
+
   @override
   Widget build(BuildContext context) {
     return ValueListenableBuilder<ThemeMode>(
@@ -101,7 +113,7 @@ class _MyAppState extends State<MyApp> {
           debugShowCheckedModeBanner: false,
           routerConfig: _router,
           title: 'MikuFans',
-          themeMode: ThemeMode.system,
+          themeMode: themeMode,
           theme: ThemeData(
             brightness: Brightness.light,
             colorSchemeSeed: const Color(0xffd08b57),
