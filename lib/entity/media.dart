@@ -6,12 +6,11 @@ part 'media.g.dart';
 class Media {
   String? id;
   String? title;
-  @JsonKey(name: 'title_cn')
-  String? titleCn;
+
   String? coverUrl;
   double? score;
 
-  Media({this.id, this.title, this.titleCn, this.coverUrl, this.score = 0});
+  Media({this.id, this.title, this.coverUrl, this.score = 0});
 
   factory Media.fromJson(Map<String, dynamic> json) => _$MediaFromJson(json);
 

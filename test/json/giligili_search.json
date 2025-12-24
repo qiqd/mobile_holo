@@ -1,0 +1,65 @@
+{
+    "video_plays": [
+        {
+            "play_data": "https://play.xluuss.com/play/NbWkMGob/index.m3u8",
+            "src_site": "xlzy"
+        },
+        {
+            "play_data": "https://v.gsuus.com/play/5eVgLEoa/index.m3u8",
+            "src_site": "gszy"
+        },
+        {
+            "play_data": "https://hd.ijycnd.com/play/BeXmNJVa/index.m3u8",
+            "src_site": "jyzy"
+        },
+        {
+            "play_data": "https://hn.bfvvs.com/play/PdR2Ezwd/index.m3u8",
+            "src_site": "hnzy"
+        },
+        {
+            "play_data": "https://vip.ffzy-plays.com/20251005/46074_e14dc01a/index.m3u8",
+            "src_site": "ffzy"
+        },
+        {
+            "play_data": "https://ukzy.ukubf3.com/20251005/zNQh4eDX/index.m3u8",
+            "src_site": "ukzy"
+        },
+        {
+            "play_data": "https://bfikuncdn.com/20251004/wq88CG5A/index.m3u8",
+            "src_site": "ikzy"
+        },
+        {
+            "play_data": "https://v.cdnlz22.com/20251005/23629_7c49912f/index.m3u8",
+            "src_site": "lzzy"
+        },
+        {
+            "play_data": "https://v.cdnlz22.com/20251005/23629_7c49912f/index.m3u8",
+            "src_site": "lzzy"
+        },
+        {
+            "play_data": "https://v10.qrssuv.com/wjv10/202510/05/8Kd2amsdNV82/video/index.m3u8",
+            "src_site": "wjzy2"
+        },
+        {
+            "play_data": "https://cdn.wlcdn88.com:777/57ee61b6/index.m3u8",
+            "src_site": "wlzy2"
+        },
+        {
+            "play_data": "https://vod12.wgslsw.com/20251007/8Kd2amsdNV82/index.m3u8",
+            "src_site": "yhzy"
+        },
+        {
+            "play_data": "https://bf.jisuziyuanbf.com/play/QeZqPLgd/index.m3u8",
+            "src_site": "jszy"
+        },
+        {
+            "play_data": "https://v14.yuglf.com/202510/05/WpDN9TrCtn22/video/index.m3u8",
+            "src_site": "snzy"
+        },
+        {
+            "play_data": "https://play.modujx11.com/20251005/Pan6D0It/index.m3u8",
+            "src_site": "mdzy"
+        }
+    ],
+    "html_content": "\t\t\t\t\t\t\n\t\t\t\t\t\t\n\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t<li class=\"ep-col mb-2\">\n\t\t\t\t\t\t\t\t<a class=\"swa current\" onclick=\"sw_p(this)\" href='/_player_x_/https://play.xluuss.com/play/NbWkMGob/index.m3u8' target=\"p-frame\">XL</a>\n\t\t\t\t\t\t\t</li>\n\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t<li class=\"ep-col mb-2\">\n\t\t\t\t\t\t\t\t<a class=\"swa \" onclick=\"sw_p(this)\" href='/_player_x_/https://v.gsuus.com/play/5eVgLEoa/index.m3u8' target=\"p-frame\">GS</a>\n\t\t\t\t\t\t\t</li>\n\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t<li class=\"ep-col mb-2\">\n\t\t\t\t\t\t\t\t<a class=\"swa \" onclick=\"sw_p(this)\" href='/_player_x_/https://hd.ijycnd.com/play/BeXmNJVa/index.m3u8' target=\"p-frame\">JY</a>\n\t\t\t\t\t\t\t</li>\n\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t<li class=\"ep-col mb-2\">\n\t\t\t\t\t\t\t\t<a class=\"swa \" onclick=\"sw_p(this)\" href='/_player_x_/https://hn.bfvvs.com/play/PdR2Ezwd/index.m3u8' target=\"p-frame\">HN</a>\n\t\t\t\t\t\t\t</li>\n\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t<li class=\"ep-col mb-2\">\n\t\t\t\t\t\t\t\t<a class=\"swa \" onclick=\"sw_p(this)\" href='/_player_x_/https://vip.ffzy-plays.com/20251005/46074_e14dc01a/index.m3u8' target=\"p-frame\">FF</a>\n\t\t\t\t\t\t\t</li>\n\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t<li class=\"ep-col mb-2\">\n\t\t\t\t\t\t\t\t<a class=\"swa \" onclick=\"sw_p(this)\" href='/_player_x_/https://ukzy.ukubf3.com/20251005/zNQh4eDX/index.m3u8' target=\"p-frame\">UK</a>\n\t\t\t\t\t\t\t</li>\n\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t<li class=\"ep-col mb-2\">\n\t\t\t\t\t\t\t\t<a class=\"swa \" onclick=\"sw_p(this)\" href='/_player_x_/https://bfikuncdn.com/20251004/wq88CG5A/index.m3u8' target=\"p-frame\">IK</a>\n\t\t\t\t\t\t\t</li>\n\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t<li class=\"ep-col mb-2\">\n\t\t\t\t\t\t\t\t<a class=\"swa \" onclick=\"sw_p(this)\" href='/_player_x_/https://v.cdnlz22.com/20251005/23629_7c49912f/index.m3u8' target=\"p-frame\">LZ</a>\n\t\t\t\t\t\t\t</li>\n\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t<li class=\"ep-col mb-2\">\n\t\t\t\t\t\t\t\t<a class=\"swa \" onclick=\"sw_p(this)\" href='/_player_x_/https://v.cdnlz22.com/20251005/23629_7c49912f/index.m3u8' target=\"p-frame\">LZ</a>\n\t\t\t\t\t\t\t</li>\n\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t<li class=\"ep-col mb-2\">\n\t\t\t\t\t\t\t\t<a class=\"swa \" onclick=\"sw_p(this)\" href='/_player_x_/https://v10.qrssuv.com/wjv10/202510/05/8Kd2amsdNV82/video/index.m3u8' target=\"p-frame\">WJ</a>\n\t\t\t\t\t\t\t</li>\n\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t<li class=\"ep-col mb-2\">\n\t\t\t\t\t\t\t\t<a class=\"swa \" onclick=\"sw_p(this)\" href='/_player_x_/https://cdn.wlcdn88.com:777/57ee61b6/index.m3u8' target=\"p-frame\">WL</a>\n\t\t\t\t\t\t\t</li>\n\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t<li class=\"ep-col mb-2\">\n\t\t\t\t\t\t\t\t<a class=\"swa \" onclick=\"sw_p(this)\" href='/_player_x_/https://vod12.wgslsw.com/20251007/8Kd2amsdNV82/index.m3u8' target=\"p-frame\">YH</a>\n\t\t\t\t\t\t\t</li>\n\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t<li class=\"ep-col mb-2\">\n\t\t\t\t\t\t\t\t<a class=\"swa \" onclick=\"sw_p(this)\" href='/_player_x_/https://bf.jisuziyuanbf.com/play/QeZqPLgd/index.m3u8' target=\"p-frame\">JS</a>\n\t\t\t\t\t\t\t</li>\n\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t<li class=\"ep-col mb-2\">\n\t\t\t\t\t\t\t\t<a class=\"swa \" onclick=\"sw_p(this)\" href='/_player_x_/https://v14.yuglf.com/202510/05/WpDN9TrCtn22/video/index.m3u8' target=\"p-frame\">SN</a>\n\t\t\t\t\t\t\t</li>\n\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t<li class=\"ep-col mb-2\">\n\t\t\t\t\t\t\t\t<a class=\"swa \" onclick=\"sw_p(this)\" href='/_player_x_/https://play.modujx11.com/20251005/Pan6D0It/index.m3u8' target=\"p-frame\">MD</a>\n\t\t\t\t\t\t\t</li>\n\t\t\t\t\t\t\t\n\t\t\t\t\t\t\n\t\t\t\t\t\t"
+}

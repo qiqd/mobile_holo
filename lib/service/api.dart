@@ -1,5 +1,5 @@
-import 'package:mobile_holo/service/impl/aafun.dart';
-import 'package:mobile_holo/service/impl/bangumi.dart';
+import 'package:mobile_holo/service/impl/animation/aafun.dart';
+import 'package:mobile_holo/service/impl/meta/bangumi.dart';
 import 'package:mobile_holo/service/source_service.dart';
 import 'package:mobile_holo/service/util/dio_timing_extension.dart';
 import 'package:mobile_holo/service/util/http_util.dart';

@@ -71,7 +71,7 @@ class AAfun implements SourceService {
               final a = li.querySelector("div.hl-item-div a");
               return Media(
                 id: a?.attributes["href"],
-                titleCn: a?.attributes["title"],
+                title: a?.attributes["title"],
                 coverUrl: a?.attributes["data-original"],
               );
             })

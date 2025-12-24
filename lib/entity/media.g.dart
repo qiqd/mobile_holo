@@ -9,16 +9,17 @@ part of 'media.dart';
 Media _$MediaFromJson(Map<String, dynamic> json) => Media(
   id: json['id'] as String?,
   title: json['title'] as String?,
-  titleCn: json['title_cn'] as String?,
+
   coverUrl: json['coverUrl'] as String?,
-  score: json['source'] as double?,
+  score: (json['score'] as num?)?.toDouble() ?? 0,
 );
 
 Map<String, dynamic> _$MediaToJson(Media instance) => <String, dynamic>{
   'id': instance.id,
   'title': instance.title,
-  'title_cn': instance.titleCn,
+
   'coverUrl': instance.coverUrl,
+  'score': instance.score,
 };
 
 Line _$LineFromJson(Map<String, dynamic> json) => Line(
@@ -37,12 +38,12 @@ Detail _$DetailFromJson(Map<String, dynamic> json) => Detail(
   media: json['media'] == null
       ? null
       : Media.fromJson(json['media'] as Map<String, dynamic>),
-  lines: (json['sources'] as List<dynamic>?)
+  lines: (json['lines'] as List<dynamic>?)
       ?.map((e) => Line.fromJson(e as Map<String, dynamic>))
       .toList(),
 );
 
 Map<String, dynamic> _$DetailToJson(Detail instance) => <String, dynamic>{
   'media': instance.media,
-  'sources': instance.lines,
+  'lines': instance.lines,
 };

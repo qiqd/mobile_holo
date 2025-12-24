@@ -31,7 +31,7 @@ class PlayerScreen extends StatefulWidget {
 }
 
 class _PlayerScreenState extends State<PlayerScreen>
-    with SingleTickerProviderStateMixin {
+    with SingleTickerProviderStateMixin, WidgetsBindingObserver {
   bool _isFullScreen = false;
   String msg = "";
   int episodeIndex = 0;
@@ -49,6 +49,7 @@ class _PlayerScreenState extends State<PlayerScreen>
     vsync: this,
     length: 2,
   );
+
   Future<void> _fetchMediaEpisode() async {
     isloading = true;
     try {
@@ -152,7 +153,18 @@ class _PlayerScreenState extends State<PlayerScreen>
   }
 
   @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    if (state == AppLifecycleState.paused) {
+      log("pause");
+    } else if (state == AppLifecycleState.resumed) {
+      log("resume");
+    }
+  }
+
+  @override
   void initState() {
+    WidgetsBinding.instance.addObserver(this);
     _fetchEpisode();
     _fetchMediaEpisode().then((value) => _fetchViewInfo());
     super.initState();
@@ -162,6 +174,7 @@ class _PlayerScreenState extends State<PlayerScreen>
   void dispose() {
     _controller?.dispose();
     SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
+    WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }
 

@@ -164,7 +164,7 @@ class _CapVideoPlayerState extends State<CapVideoPlayer> {
   void decreaseVolumeBy1Percent(SwipeDirection direction) async {
     showMsg = true;
     _startOrRestartTimer();
-    final current = await VolumeController.instance.getVolume();
+    final current = widget.controller.value.volume;
     double newVolume = current;
     if (direction == SwipeDirection.up) {
       newVolume = current + 0.01;
@@ -173,7 +173,7 @@ class _CapVideoPlayerState extends State<CapVideoPlayer> {
     }
     log("set volume to $newVolume");
     newVolume = newVolume.clamp(0.0, 1.0);
-    await VolumeController.instance.setVolume(newVolume);
+    widget.controller.setVolume(newVolume);
     setState(() {
       showMsg = true;
       msgText = '音量: ${(newVolume * 100).toStringAsFixed(0)}%';

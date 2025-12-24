@@ -68,7 +68,7 @@ class _DetailScreenState extends State<DetailScreen>
     await Future.wait(future);
     for (var value in source2Media.values) {
       for (var m in value) {
-        m.score = JaroWinklerSimilarity.apply(widget.keyword, m.titleCn);
+        m.score = JaroWinklerSimilarity.apply(widget.keyword, m.title!);
       }
     }
     for (var value in source2Media.values) {
@@ -151,7 +151,7 @@ class _DetailScreenState extends State<DetailScreen>
               "mediaId": defaultMedia!.id!,
               "subjectId": widget.id,
               "source": defaultSource!,
-              "nameCn": defaultMedia!.titleCn!,
+              "nameCn": defaultMedia!.title!,
             },
           );
         },
@@ -236,7 +236,7 @@ class _DetailScreenState extends State<DetailScreen>
                                                         score: m.score ?? 0,
                                                         imageUrl: m.coverUrl!,
                                                         nameCn:
-                                                            m.titleCn ?? "暂无标题",
+                                                            m.title ?? "暂无标题",
                                                         name: m.title,
                                                         height: 150,
                                                         onTap: () {
@@ -248,7 +248,8 @@ class _DetailScreenState extends State<DetailScreen>
                                                                   widget.id,
                                                               "source": e,
                                                               "nameCn":
-                                                                  m.titleCn!,
+                                                                  m.title ??
+                                                                  "暂无标题",
                                                             },
                                                           );
                                                         },

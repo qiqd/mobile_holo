@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mobile_holo/entity/subject.dart';
@@ -30,10 +32,28 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _fetchRecommended() async {
+    setState(() {
+      _loading = true;
+    });
     final recommended = await Api.bangumi.fetchRecommendSync(1, 20, (e) {});
     setState(() {
       _recommended = recommended;
     });
+    setState(() {
+      _loading = false;
+    });
+  }
+
+  @override
+  void activate() {
+    super.activate();
+    log('activate');
+  }
+
+  @override
+  void deactivate() {
+    super.deactivate();
+    log('deactivate');
   }
 
   @override
