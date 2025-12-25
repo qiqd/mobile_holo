@@ -135,18 +135,22 @@ class Mengdao implements SourceService {
       // 复制有效数据
       List<int> validData = decryptedBytes.sublist(0, endIndex);
       String result = utf8.decode(validData);
+      var epsList = result
+          .split("#")
+          .map((s) {
+            return s.substring(s.indexOf("\$") + 1, s.lastIndexOf("\$"));
+          })
+          .map((s) {
+            return s.replaceAll(RegExp(r'\$[^$]*\$'), '');
+          })
+          .toList();
+      var episodeIndex = episodeId.substring(
+        episodeId.lastIndexOf("-") + 1,
+        episodeId.lastIndexOf("."),
+      );
+      var videoData = epsList[int.parse(episodeIndex)];
 
-      VideoData videoData = parseVideoData(result);
-
-      var values = videoData.sources.values.toList();
-      for (var item in values) {
-        for (var i in item) {
-          if (i.m3u8Url!.contains("http")) {
-            return i.m3u8Url;
-          }
-        }
-      }
-      return null;
+      return videoData.replaceAll("http://", "https://");
     } catch (e) {
       log("Mengdao fetchView error: $e");
       exceptionHandler(e);

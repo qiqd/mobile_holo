@@ -7,7 +7,6 @@ import 'package:html/parser.dart';
 import 'package:mobile_holo/entity/media.dart';
 import 'package:mobile_holo/service/source_service.dart';
 import 'package:mobile_holo/service/util/http_util.dart';
-import 'package:pointycastle/padded_block_cipher/padded_block_cipher_impl.dart';
 
 class Mwcy implements SourceService {
   @override

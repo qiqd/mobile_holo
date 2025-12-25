@@ -5,7 +5,6 @@ import 'package:mobile_holo/main.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:mobile_holo/service/util/local_store.dart';
 import 'package:package_info_plus/package_info_plus.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class SetttingScreen extends StatefulWidget {

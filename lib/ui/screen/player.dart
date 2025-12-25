@@ -42,6 +42,7 @@ class _PlayerScreenState extends State<PlayerScreen>
   Detail? _detail;
   bool isloading = false;
   Data? subject;
+  int historyPosition = 0;
   late final String nameCn = widget.nameCn;
   late final String mediaId = widget.mediaId;
   late final SourceService source = widget.source;
@@ -76,7 +77,7 @@ class _PlayerScreenState extends State<PlayerScreen>
     }
   }
 
-  void _fetchViewInfo() async {
+  void _fetchViewInfo({int position = 0}) async {
     msg = "";
     isloading = true;
     try {
@@ -98,6 +99,7 @@ class _PlayerScreenState extends State<PlayerScreen>
         await newController.initialize();
         setState(() {
           _controller = newController;
+          _controller?.seekTo(Duration(seconds: position));
           _controller?.play();
         });
       }
@@ -119,6 +121,12 @@ class _PlayerScreenState extends State<PlayerScreen>
   }
 
   void _onEpisodeSelected(int index) {
+    if (index >= _detail!.lines![lineIndex].episodes!.length) {
+      setState(() {
+        msg = "该剧集不存在";
+      });
+      return;
+    }
     setState(() {
       episodeIndex = index;
     });
@@ -131,6 +139,7 @@ class _PlayerScreenState extends State<PlayerScreen>
       setState(() {
         episodeIndex = history.episodeIndex;
         lineIndex = history.lineIndex;
+        historyPosition = history.position;
       });
     }
   }
@@ -194,7 +203,9 @@ class _PlayerScreenState extends State<PlayerScreen>
     WidgetsBinding.instance.addObserver(this);
     _loadHistory();
     _fetchEpisode();
-    _fetchMediaEpisode().then((value) => _fetchViewInfo());
+    _fetchMediaEpisode().then(
+      (value) => _fetchViewInfo(position: historyPosition),
+    );
     super.initState();
   }
 
@@ -227,6 +238,9 @@ class _PlayerScreenState extends State<PlayerScreen>
                             isloading: isloading,
                             controller: _controller!,
                             isFullScreen: _isFullScreen,
+                            onError: (error) => setState(() {
+                              msg = error.toString();
+                            }),
                             onNextTab: () {
                               if (isloading ||
                                   episodeIndex + 1 >
@@ -264,6 +278,9 @@ class _PlayerScreenState extends State<PlayerScreen>
                               isloading: isloading,
                               controller: _controller!,
                               isFullScreen: _isFullScreen,
+                              onError: (error) => setState(() {
+                                msg = error.toString();
+                              }),
                               onNextTab: () {
                                 if (isloading ||
                                     episodeIndex + 1 >

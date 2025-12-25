@@ -141,6 +141,9 @@ class _CapVideoPlayerState extends State<CapVideoPlayer> {
   }
 
   void decreaseBrightnessBy1Percent(SwipeDirection direction) async {
+    if (isLock) {
+      return;
+    }
     showMsg = true;
     _startOrRestartTimer();
     final current = await brightnessController.application;
@@ -162,6 +165,9 @@ class _CapVideoPlayerState extends State<CapVideoPlayer> {
   }
 
   void decreaseVolumeBy1Percent(SwipeDirection direction) async {
+    if (isLock) {
+      return;
+    }
     showMsg = true;
     _startOrRestartTimer();
     final current = widget.controller.value.volume;
@@ -357,7 +363,7 @@ class _CapVideoPlayerState extends State<CapVideoPlayer> {
                           Expanded(
                             child: Slider(
                               padding: EdgeInsets.symmetric(
-                                horizontal: 10,
+                                horizontal: 30,
                                 vertical: 0,
                               ),
                               secondaryTrackValue: getBufferedEnd(),
