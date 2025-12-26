@@ -87,6 +87,11 @@ class _PlayerScreenState extends State<PlayerScreen>
         await _controller?.pause();
         await _controller?.dispose();
         _controller = null;
+        lineIndex = lineIndex.clamp(0, _detail!.lines!.length - 1);
+        episodeIndex = episodeIndex.clamp(
+          0,
+          _detail!.lines![lineIndex].episodes!.length - 1,
+        );
         final newUrl = await source.fetchView(
           _detail!.lines![lineIndex].episodes![episodeIndex],
           (e) => setState(() {
@@ -110,7 +115,7 @@ class _PlayerScreenState extends State<PlayerScreen>
     } catch (e) {
       log("fetchView error: $e");
       setState(() {
-        msg = e.toString();
+        msg = "无法获取播放地址,换条路线试试";
       });
     } finally {
       isloading = false;
@@ -127,7 +132,7 @@ class _PlayerScreenState extends State<PlayerScreen>
   void _onEpisodeSelected(int index) {
     if (index >= _detail!.lines![lineIndex].episodes!.length) {
       setState(() {
-        msg = "该剧集不存在";
+        msg = "该集不存在";
       });
       return;
     }
@@ -244,9 +249,15 @@ class _PlayerScreenState extends State<PlayerScreen>
                             isloading: isloading,
                             controller: _controller!,
                             isFullScreen: _isFullScreen,
+                            currentEpisodeIndex: episodeIndex,
+                            episodeList:
+                                _episode?.data?.map((e) => e.name!).toList() ??
+                                [],
                             onError: (error) => setState(() {
                               msg = error.toString();
                             }),
+                            onEpisodeSelected: (index) =>
+                                _onEpisodeSelected(index),
                             onNextTab: () {
                               if (isloading ||
                                   episodeIndex + 1 >
@@ -268,9 +279,16 @@ class _PlayerScreenState extends State<PlayerScreen>
                               });
                             },
                           )
-                        : LoadingOrShowMsg(
-                            msg: msg,
-                            backgroundColor: Colors.black,
+                        : PopScope(
+                            canPop: false,
+                            onPopInvokedWithResult: (didPop, result) =>
+                                setState(() {
+                                  _isFullScreen = false;
+                                }),
+                            child: LoadingOrShowMsg(
+                              msg: msg,
+                              backgroundColor: Colors.black,
+                            ),
                           ),
                   ),
                 )

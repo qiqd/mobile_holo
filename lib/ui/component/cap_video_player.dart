@@ -15,18 +15,24 @@ class CapVideoPlayer extends StatefulWidget {
   final bool isloading;
   final String? title;
   final bool isFullScreen;
+  final List<String> episodeList;
+  final int currentEpisodeIndex;
   final Function(bool)? onFullScreenChanged;
   final Function(String)? onError;
   final Function()? onNextTab;
+  final Function(int index)? onEpisodeSelected;
   const CapVideoPlayer({
     super.key,
     required this.controller,
     required this.isloading,
     this.isFullScreen = false,
+    this.currentEpisodeIndex = 0,
     this.title = "暂无标题",
+    this.episodeList = const [],
     this.onFullScreenChanged,
     this.onNextTab,
     this.onError,
+    this.onEpisodeSelected,
   });
 
   @override
@@ -48,6 +54,7 @@ class _CapVideoPlayerState extends State<CapVideoPlayer> {
   String msgText = '';
   bool showMsg = false;
   bool showVideoControls = true;
+  bool showEpisodeList = false;
   bool isForward = true;
   int jumpMs = 0;
   int dragOffset = 0;
@@ -57,6 +64,7 @@ class _CapVideoPlayerState extends State<CapVideoPlayer> {
   Timer? _videoTimer;
   void _showVideoControlsTimer() {
     log("showVideoControlsTimer");
+
     _videoControlsTimer?.cancel();
     _videoControlsTimer = Timer(Duration(seconds: 5), () {
       if (mounted) {
@@ -140,7 +148,7 @@ class _CapVideoPlayerState extends State<CapVideoPlayer> {
     });
   }
 
-  void decreaseBrightnessBy1Percent(SwipeDirection direction) async {
+  void _decreaseBrightnessBy1Percent(SwipeDirection direction) async {
     if (isLock) {
       return;
     }
@@ -164,7 +172,7 @@ class _CapVideoPlayerState extends State<CapVideoPlayer> {
     });
   }
 
-  void decreaseVolumeBy1Percent(SwipeDirection direction) async {
+  void _decreaseVolumeBy1Percent(SwipeDirection direction) async {
     if (isLock) {
       return;
     }
@@ -186,7 +194,7 @@ class _CapVideoPlayerState extends State<CapVideoPlayer> {
     });
   }
 
-  void handleVideoProgressChange(SwipeDirection direction) {
+  void _handleVideoProgressChange(SwipeDirection direction) {
     log("handleVideoProgressChange $direction");
     if (isLock) {
       return;
@@ -239,9 +247,9 @@ class _CapVideoPlayerState extends State<CapVideoPlayer> {
       child: Stack(
         children: [
           //播放器
-          !isBuffering && !widget.isloading
-              ? VideoPlayer(player)
-              : LoadingOrShowMsg(msg: msgText, backgroundColor: Colors.black),
+          VideoPlayer(player),
+          // 加载中或缓冲中
+          if (isBuffering || widget.isloading) LoadingOrShowMsg(msg: null),
           AnimatedOpacity(
             curve: showMsg ? Curves.decelerate : Curves.easeOutQuart,
             opacity: showMsg ? 1.0 : 0.0,
@@ -298,6 +306,9 @@ class _CapVideoPlayerState extends State<CapVideoPlayer> {
                       swipeDetectionBehavior: SwipeDetectionBehavior.continuous,
                     ),
                     onTap: () => setState(() {
+                      setState(() {
+                        showEpisodeList = false;
+                      });
                       _showVideoControlsTimer();
                       showVideoControls = !showVideoControls;
                     }),
@@ -306,13 +317,13 @@ class _CapVideoPlayerState extends State<CapVideoPlayer> {
                       _showVideoControlsTimer();
                     },
                     onHorizontalSwipe: (direction) =>
-                        handleVideoProgressChange(direction),
+                        _handleVideoProgressChange(direction),
                     child: Row(
                       children: [
                         Flexible(
                           child: SimpleGestureDetector(
                             swipeConfig: SimpleSwipeConfig(
-                              verticalThreshold: 1,
+                              verticalThreshold: 10,
                               horizontalThreshold: 9999,
                               swipeDetectionBehavior:
                                   SwipeDetectionBehavior.continuous,
@@ -322,7 +333,7 @@ class _CapVideoPlayerState extends State<CapVideoPlayer> {
                                   direction == SwipeDirection.right) {
                                 return;
                               }
-                              decreaseBrightnessBy1Percent(direction);
+                              _decreaseBrightnessBy1Percent(direction);
                             },
 
                             child: Container(color: Colors.transparent),
@@ -331,7 +342,7 @@ class _CapVideoPlayerState extends State<CapVideoPlayer> {
                         Flexible(
                           child: SimpleGestureDetector(
                             swipeConfig: SimpleSwipeConfig(
-                              verticalThreshold: 1,
+                              verticalThreshold: 10,
                               horizontalThreshold: 9999,
                               swipeDetectionBehavior:
                                   SwipeDetectionBehavior.continuous,
@@ -341,7 +352,7 @@ class _CapVideoPlayerState extends State<CapVideoPlayer> {
                                   direction == SwipeDirection.right) {
                                 return;
                               }
-                              decreaseVolumeBy1Percent(direction);
+                              _decreaseVolumeBy1Percent(direction);
                             },
 
                             child: Container(color: Colors.transparent),
@@ -421,26 +432,39 @@ class _CapVideoPlayerState extends State<CapVideoPlayer> {
                           ),
                           //剧集列表
                           if (_isFullScreen) ...[
-                            IconButton(
-                              onPressed: () {
-                                _showVideoControlsTimer();
-                              },
-                              icon: Icon(
-                                Icons.format_list_bulleted_rounded,
-                                color: Colors.white,
+                            Badge(
+                              backgroundColor: Colors.transparent,
+
+                              offset: Offset(0, 5),
+                              label: Text("${widget.currentEpisodeIndex + 1} "),
+                              child: IconButton(
+                                onPressed: () {
+                                  setState(() {
+                                    showEpisodeList = !showEpisodeList;
+                                  });
+                                  _showVideoControlsTimer();
+                                },
+                                icon: Icon(
+                                  Icons.format_list_bulleted_rounded,
+                                  color: Colors.white,
+                                ),
                               ),
                             ),
                           ],
                           //进度
-                          Text(
-                            "${widget.controller.value.position.inMinutes}:${widget.controller.value.position.inSeconds.remainder(60)}/${widget.controller.value.duration.inMinutes}:${widget.controller.value.duration.inSeconds.remainder(60)}",
-                            style: TextStyle(color: Colors.white),
+                          TextButton(
+                            onPressed: null,
+                            child: Text(
+                              "${widget.controller.value.position.inMinutes}:${widget.controller.value.position.inSeconds.remainder(60)}/${widget.controller.value.duration.inMinutes}:${widget.controller.value.duration.inSeconds.remainder(60)}",
+                              style: TextStyle(color: Colors.white),
+                            ),
                           ),
 
                           Padding(
                             padding: EdgeInsets.only(left: 10),
                             child: PopupMenuButton(
                               child: Badge(
+                                offset: Offset(8, -5),
                                 backgroundColor: Colors.transparent,
                                 label: Text(
                                   widget.controller.value.playbackSpeed
@@ -557,6 +581,28 @@ class _CapVideoPlayerState extends State<CapVideoPlayer> {
                   "${DateTime.now().hour}:${DateTime.now().minute}",
                   style: TextStyle(color: Colors.white),
                 ),
+              ),
+            ),
+          ),
+          AnimatedPositioned(
+            top: 0,
+            right: showEpisodeList ? 0 : -200,
+            width: 200,
+            height: MediaQuery.of(context).size.height,
+            duration: const Duration(milliseconds: 300),
+            child: Container(
+              color: Colors.white,
+              child: ListView.builder(
+                itemCount: widget.episodeList.length,
+                itemBuilder: (context, index) {
+                  return ListTile(
+                    selected: index == widget.currentEpisodeIndex,
+                    horizontalTitleGap: 0,
+                    leading: Text((index + 1).toString()),
+                    title: Text(widget.episodeList[index]),
+                    onTap: () => widget.onEpisodeSelected?.call(index),
+                  );
+                },
               ),
             ),
           ),

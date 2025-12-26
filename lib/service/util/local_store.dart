@@ -71,6 +71,21 @@ class LocalStore {
     _prefs!.clear();
   }
 
+  static List<String> getSearchHistory() {
+    if (_prefs == null) return [];
+    return _prefs!.getStringList("${_key}_search") ?? [];
+  }
+
+  static void removeAllSearchHistory() {
+    if (_prefs == null) return;
+    _prefs!.remove("${_key}_search");
+  }
+
+  static void saveSearchHistory(List<String> history) {
+    if (_prefs == null) return;
+    _prefs!.setStringList("${_key}_search", history);
+  }
+
   static bool getBool(String key, {bool defaultValue = false}) {
     return _prefs!.getBool(key) ?? defaultValue;
   }

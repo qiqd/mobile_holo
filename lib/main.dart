@@ -10,6 +10,7 @@ import 'package:mobile_holo/ui/screen/detail.dart';
 
 import 'package:mobile_holo/ui/screen/home.dart';
 import 'package:mobile_holo/ui/screen/player.dart';
+import 'package:mobile_holo/ui/screen/search.dart';
 
 import 'package:mobile_holo/ui/screen/setting.dart';
 import 'package:mobile_holo/ui/screen/subscribe.dart';
@@ -90,6 +91,12 @@ class _MyAppState extends State<MyApp> {
             source: map['source'] as SourceService,
             nameCn: map['nameCn'] as String,
           );
+        },
+      ),
+      GoRoute(
+        path: '/search',
+        builder: (context, state) {
+          return SearchScreen();
         },
       ),
     ],

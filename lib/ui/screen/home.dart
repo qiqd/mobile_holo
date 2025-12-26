@@ -14,51 +14,39 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  final ScrollController _scrollController = ScrollController();
   Subject? _recommended;
   bool _loading = false;
-  void _fetchSearch(String keyword, BuildContext context) async {
-    setState(() {
-      _loading = true;
-    });
-    final result = await Api.bangumi.fetchSearchSync(keyword, (e) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('搜索出错: ${e.toString()}')));
-    });
-    setState(() {
-      _loading = false;
-      _recommended = result;
-    });
-  }
+  int _page = 1;
 
-  void _fetchRecommended() async {
+  void _fetchRecommended({int page = 1, bool isLoadMore = false}) async {
     setState(() {
       _loading = true;
     });
-    final recommended = await Api.bangumi.fetchRecommendSync(1, 20, (e) {});
+    final recommended = await Api.bangumi.fetchRecommendSync(page, 20, (e) {});
     setState(() {
-      _recommended = recommended;
+      isLoadMore
+          ? _recommended?.data?.addAll(recommended?.data ?? [])
+          : _recommended = recommended;
     });
     setState(() {
       _loading = false;
     });
   }
 
-  @override
-  void activate() {
-    super.activate();
-    log('activate');
-  }
-
-  @override
-  void deactivate() {
-    super.deactivate();
-    log('deactivate');
+  void _onScrollToBottom() {
+    log("scroll to bottom");
+    if (_scrollController.position.pixels >=
+            _scrollController.position.maxScrollExtent - 100 &&
+        !_loading) {
+      _fetchRecommended(page: ++_page, isLoadMore: true);
+    }
   }
 
   @override
   void initState() {
     super.initState();
+    _scrollController.addListener(_onScrollToBottom);
     _fetchRecommended();
   }
 
@@ -68,38 +56,16 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: AppBar(
         animateColor: true,
         surfaceTintColor: Colors.red,
-        title: SizedBox(
-          child: Row(
-            children: [
-              Text("推荐"),
-              Expanded(
-                child: Container(
-                  margin: const EdgeInsets.only(left: 16),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.9),
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: TextField(
-                    onSubmitted: (value) {
-                      _fetchSearch(value, context);
-                    },
-                    autofocus: false,
-                    decoration: InputDecoration(
-                      hintText: "搜索动漫、电影...",
-                      hintStyle: TextStyle(color: Colors.grey[400]),
-                      prefixIcon: Icon(Icons.search, color: Colors.grey[600]),
-                      border: InputBorder.none,
-                      contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 12,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ],
+        title: Text("推荐"),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.search_rounded),
+            onPressed: () {
+              context.push('/search');
+            },
           ),
-        ),
+          SizedBox(width: 12),
+        ],
       ),
       body: Column(
         children: [
@@ -109,6 +75,7 @@ class _HomeScreenState extends State<HomeScreen> {
               child: _recommended == null
                   ? Text("暂无推荐")
                   : GridView.builder(
+                      controller: _scrollController,
                       itemCount: _recommended!.data!.length,
                       padding: EdgeInsets.symmetric(horizontal: 12),
                       gridDelegate:
