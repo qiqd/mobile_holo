@@ -75,7 +75,11 @@ class Senfen implements SourceService {
           var infoBox = item.querySelector("div.module-item-pic img");
           var cover = infoBox?.attributes["data-original"];
           var title = infoBox?.attributes["alt"];
-          return Media(id: id, coverUrl: cover, title: title);
+          var status = item
+              .querySelector("div.module-info-item-content")
+              ?.text
+              .trim();
+          return Media(id: id, type: status, coverUrl: cover, title: title);
         }).toList();
       }
       return [];

@@ -12,6 +12,7 @@ import 'package:mobile_holo/service/util/jaro_winkler_similarity.dart';
 import 'package:mobile_holo/service/util/local_store.dart';
 import 'package:mobile_holo/ui/component/loading_msg.dart';
 import 'package:mobile_holo/ui/component/meida_card.dart';
+import 'package:visibility_detector/visibility_detector.dart';
 
 class DetailScreen extends StatefulWidget {
   final int id;
@@ -49,12 +50,10 @@ class _DetailScreenState extends State<DetailScreen>
         _msg = e.toString();
       });
     });
-    if (mounted) {
-      setState(() {
-        data = res;
-        _loadHistory();
-      });
-    }
+    setState(() {
+      data = res;
+      _loadHistory();
+    });
   }
 
   Future<void> _fetchMedia() async {
@@ -130,27 +129,43 @@ class _DetailScreenState extends State<DetailScreen>
   }
 
   void _loadHistory() {
-    final loved = LocalStore.getHistoryById(data!.id!)?.isLove ?? false;
-    setState(() {
-      isSubscribed = loved;
-    });
+    final history = LocalStore.getHistoryById(data!.id!);
+    if (mounted) {
+      setState(() {
+        isSubscribed = history?.isLove ?? false;
+      });
+    }
   }
 
   void _storeLocalHistory() {
-    History history = History(
-      id: data!.id!,
-      title: data!.nameCn!,
-      imgUrl: data!.images?.large ?? "",
-      isLove: isSubscribed,
-    );
+    var history = LocalStore.getHistoryById(data!.id!);
+    if (history == null) {
+      history = History(
+        id: data!.id!,
+        title: data!.nameCn!,
+        imgUrl: data!.images?.large ?? "",
+        isLove: isSubscribed,
+      );
+    } else {
+      history.isLove = isSubscribed;
+      history.lastViewAt = DateTime.now();
+    }
     LocalStore.addHistory(history);
   }
 
-  void subscribeHandle() async {
+  void subscribeHandle() {
     setState(() {
       isSubscribed = !isSubscribed;
     });
     _storeLocalHistory();
+  }
+
+  @override
+  void dispose() {
+    _storeLocalHistory();
+    tabController.dispose();
+    subTabController.dispose();
+    super.dispose();
   }
 
   @override
@@ -264,11 +279,12 @@ class _DetailScreenState extends State<DetailScreen>
                                                     children: [
                                                       MeidaCard(
                                                         id: 0,
+
                                                         score: m.score ?? 0,
                                                         imageUrl: m.coverUrl!,
                                                         nameCn:
                                                             m.title ?? "暂无标题",
-                                                        name: m.title,
+                                                        genre: m.type,
                                                         height: 150,
                                                         onTap: () {
                                                           context.push(
@@ -304,7 +320,6 @@ class _DetailScreenState extends State<DetailScreen>
           ),
         ],
       ),
-
       body: data == null
           ? Center(child: CircularProgressIndicator())
           : Padding(

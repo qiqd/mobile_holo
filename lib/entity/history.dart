@@ -7,11 +7,11 @@ class History {
   final int id;
   final String title;
   DateTime? lastViewAt = DateTime(1980);
-  final int position;
-  final String imgUrl;
-  final bool isLove;
-  final int episodeIndex;
-  final int lineIndex;
+  int position;
+  String imgUrl;
+  bool isLove;
+  int episodeIndex;
+  int lineIndex;
   History({
     required this.id,
     required this.title,

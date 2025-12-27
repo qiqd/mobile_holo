@@ -69,9 +69,11 @@ class AAfun implements SourceService {
             .querySelectorAll("div.hl-list-wrap li.hl-list-item")
             .map((li) {
               final a = li.querySelector("div.hl-item-div a");
+              var type = li.querySelector("p.hl-item-sub.hl-lc-1")?.text;
               return Media(
                 id: a?.attributes["href"],
                 title: a?.attributes["title"],
+                type: type?.trim(),
                 coverUrl: a?.attributes["data-original"],
               );
             })

@@ -70,6 +70,11 @@ class Mwcy implements SourceService {
           "div.vod-detail.style-detail.cor4.search-list",
         );
         var medias = res.map((item) {
+          var status = item
+              .querySelectorAll("span.slide-info-remarks")
+              .map((e) => e.text)
+              .toList()
+              .join("·");
           var box = item.querySelector("div.detail-pic img");
           var nameCn = box?.attributes["alt"] ?? "";
           var cover = box?.attributes["data-src"] ?? "";
@@ -78,7 +83,7 @@ class Mwcy implements SourceService {
                   .querySelector("div.detail-info.rel.flex-auto.lightSpeedIn a")
                   ?.attributes["href"] ??
               "";
-          return Media(id: id, title: nameCn, coverUrl: cover);
+          return Media(id: id, type: status, title: nameCn, coverUrl: cover);
         }).toList();
         return medias;
       }

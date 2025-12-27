@@ -74,8 +74,13 @@ class Girugiru implements SourceService {
           var title = item
               .querySelector("img.gen-movie-img")
               ?.attributes["alt"];
+          var statusCode = item.querySelectorAll(
+            "div.detail-info.rel.flex-auto.lightSpeedIn div.slide-info.hide.this-wap",
+          );
+          var status = statusCode.map((e) => e.text).toList().join("·");
           return Media(
             id: id ?? "",
+            type: status,
             title: title ?? "",
             coverUrl: getBaseUrl() + cover,
           );
