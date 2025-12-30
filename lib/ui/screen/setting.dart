@@ -21,6 +21,7 @@ class SetttingScreen extends StatefulWidget {
 class _SetttingScreenState extends State<SetttingScreen> {
   String _version = '';
   String? _email;
+  String? _token;
   @override
   void initState() {
     super.initState();
@@ -46,9 +47,9 @@ class _SetttingScreenState extends State<SetttingScreen> {
             key: const Key('account_info_section'),
             child: ListTile(
               leading: const Icon(Icons.account_circle_rounded),
-              title: Text(_email ?? '未登录'),
+              title: Text(_email != null && _token != null ? _email! : '未登录'),
               onTap: () {
-                if (_email == null) {
+                if (_email == null || _token == null) {
                   context.push('/sign');
                 }
               },
@@ -58,6 +59,7 @@ class _SetttingScreenState extends State<SetttingScreen> {
               if (visibilityInfo.visibleFraction > 0) {
                 setState(() {
                   _email = LocalStore.getEmail();
+                  _token = LocalStore.getToken();
                 });
               }
             },
@@ -65,7 +67,7 @@ class _SetttingScreenState extends State<SetttingScreen> {
           ListTile(
             leading: const Icon(Icons.exit_to_app),
             title: const Text('退出账号'),
-            subtitle: Text('退出当前账号,但是本地历史记录数据不会删除'),
+            subtitle: const Text('退出当前账号,但是本地历史记录数据不会删除'),
             onTap: () => _showSignoutAccountDialog(),
           ),
           // 应用信息部分

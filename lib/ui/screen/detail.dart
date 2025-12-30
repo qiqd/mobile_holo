@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:mobile_holo/api/playback_api.dart';
 import 'package:mobile_holo/api/subscribe_api.dart';
 import 'package:mobile_holo/entity/character.dart';
 import 'package:mobile_holo/entity/media.dart';
@@ -170,32 +169,24 @@ class _DetailScreenState extends State<DetailScreen>
 
   void _cancelSync(int subId) {
     _syncTimer?.cancel();
-    if (isSubscribed) {
-      return;
-    }
-    _cancelSyncTimer = Timer(Duration(seconds: 5), () {
+
+    _cancelSyncTimer = Timer(Duration(seconds: 2), () {
+      if (isSubscribed) {
+        return;
+      }
       SubscribeApi.deleteSubscribeRecordBySubId(subId, () {}, (msg) {});
     });
   }
 
   void _syncSubscribeHistory(SubscribeHistory history) async {
     _syncTimer?.cancel();
-
-    _syncTimer = Timer(Duration(seconds: 5), () async {
+    _syncTimer = Timer(Duration(seconds: 2), () async {
       if (!isSubscribed) {
         return;
       }
-      SubscribeApi.saveSubscribeHistory(
-        history,
-        () {
-          history.isSync = true;
-        },
-        (e) {
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar(SnackBar(content: Text("同步订阅记录失败")));
-        },
-      ).then((newSubscribe) {});
+      SubscribeApi.saveSubscribeHistory(history, () {
+        history.isSync = true;
+      }, (e) {}).then((newSubscribe) {});
     });
   }
 
@@ -224,9 +215,9 @@ class _DetailScreenState extends State<DetailScreen>
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           if (defaultMedia == null || defaultSource == null) {
-            ScaffoldMessenger.of(
-              context,
-            ).showSnackBar(SnackBar(content: Text('没有匹配到播放源,请点击右上角手动搜索')));
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: const Text('没有匹配到播放源,请点击右上角手动搜索')),
+            );
             return;
           }
           context.push(

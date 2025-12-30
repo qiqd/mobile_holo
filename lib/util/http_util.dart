@@ -1,5 +1,6 @@
 import 'dart:math';
 import 'package:dio/dio.dart';
+import 'package:mobile_holo/util/local_store.dart';
 
 class HttpUtil {
   static final List<String> userAgents = [
@@ -61,47 +62,35 @@ class HttpUtil {
     return dio;
   }
 
-  /// 测试多个源的延迟并排序
-  ///
-  /// @param delays 延迟列表（会清空并重新填充）
-  /// @param sources 源映射
-  // static Future<void> delayTestSync(
-  //   List<SourceDelay> delays,
-  //   Map<String, Parser> sources,
-  // ) async {
-  //   delays.clear();
-  //
-  //   for (final entry in sources.entries) {
-  //     // final name = entry.key;
-  //     final parser = entry.value;
-  //
-  //     try {
-  //       final startTime = DateTime.now().millisecondsSinceEpoch;
-  //
-  //       final dio = Dio();
-  //       dio.options
-  //         ..baseUrl = parser.baseUrl
-  //         ..connectTimeout = const Duration(seconds: 5)
-  //         ..receiveTimeout = const Duration(seconds: 5)
-  //         ..sendTimeout = const Duration(seconds: 5)
-  //         ..followRedirects = true;
-  //
-  //       final response = await dio.get('');
-  //       final endTime = DateTime.now().millisecondsSinceEpoch;
-  //
-  //       int delay = -1;
-  //       if (response.statusCode == 200) {
-  //         delay = endTime - startTime;
-  //       }
-  //
-  //       delays.add(SourceDelay(delay, parser));
-  //     } catch (e) {
-  //       // 日志部分不重构，保持空实现
-  //       delays.add(SourceDelay(999999, parser));
-  //     }
-  //   }
-  //
-  //   // 按延迟排序
-  //   delays.sort((a, b) => (a.delay).compareTo(b.delay));
-  // }
+  static Dio createDioWithInterceptor() {
+    final dio = createDio();
+    dio.options.contentType = "application/json";
+    dio.interceptors.add(RequestInterceptor());
+    return dio;
+  }
+}
+
+class RequestInterceptor extends Interceptor {
+  @override
+  void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
+    var serverUrl = LocalStore.getServerUrl();
+    var token = LocalStore.getToken();
+    if (serverUrl == null) {
+      handler.reject(
+        DioException(
+          requestOptions: options,
+          response: null,
+          message: "ServerUrl is null",
+        ),
+      );
+      return;
+    }
+    options.baseUrl = serverUrl;
+    options.contentType = "application/json";
+    options.headers["User-Agent"] = "Holo/client";
+    if (token != null) {
+      options.headers["Authorization"] = token;
+    }
+    handler.next(options);
+  }
 }

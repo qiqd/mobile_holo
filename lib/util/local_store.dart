@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'package:mobile_holo/entity/playback_history.dart';
 import 'package:mobile_holo/entity/subscribe_history.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:mobile_holo/api/playback_api.dart' show PlayBackApi;
 
 class LocalStore {
   static const String _key = "holo_local_store";
@@ -11,8 +10,6 @@ class LocalStore {
 
   static Future<void> init() async {
     _prefs = await SharedPreferences.getInstance();
-
-    PlayBackApi.initServer();
   }
 
   static String? getServerUrl() {

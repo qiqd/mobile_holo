@@ -2,34 +2,19 @@ import 'dart:developer' show log;
 
 import 'package:dio/dio.dart';
 import 'package:mobile_holo/entity/playback_history.dart';
+import 'package:mobile_holo/util/http_util.dart';
 import 'package:mobile_holo/util/local_store.dart';
 
 class PlayBackApi {
-  static String serverUrl = "";
-  static String token = "";
-
-  static Dio dio = Dio();
-  static void initServer() {
-    serverUrl = LocalStore.getServerUrl() ?? "https://localhost:8080";
-    token = LocalStore.getToken() ?? "";
-    dio.options = BaseOptions(
-      headers: {"Authorization": token, "User-Agent": "Holo/client"},
-      baseUrl: "$serverUrl/history",
-      contentType: "application/json",
-      connectTimeout: const Duration(seconds: 10),
-      receiveTimeout: const Duration(seconds: 10),
-    );
-  }
-
+  static Dio dio = HttpUtil.createDioWithInterceptor();
   static Future<List<PlaybackHistory>> fetchPlaybackHistory(
     Function(String msg) exceptionHandler,
   ) async {
     try {
-      initServer();
       if (LocalStore.getServerUrl() == null) {
         return [];
       }
-      final response = await dio.get("/query/playback");
+      final response = await dio.get("/playback/query");
       if (response.statusCode == 200) {
         return (response.data as List).map((item) {
           var p = PlaybackHistory.fromJson(item);
@@ -49,11 +34,10 @@ class PlayBackApi {
     Function(String msg) exceptionHandler,
   ) async {
     try {
-      initServer();
       if (LocalStore.getServerUrl() == null) {
         return null;
       }
-      final response = await dio.get("/query/playback/$subId");
+      final response = await dio.get("/playback/query/$subId");
       if (response.statusCode == 200) {
         return PlaybackHistory.fromJson(response.data);
       }
@@ -70,11 +54,10 @@ class PlayBackApi {
     Function(String msg) exceptionHandler,
   ) async {
     try {
-      initServer();
       if (LocalStore.getServerUrl() == null) {
         return;
       }
-      final response = await dio.delete("/delete/playback");
+      final response = await dio.delete("/playback/delete");
       if (response.statusCode != 200) {
         exceptionHandler.call("删除所有播放记录失败");
       } else {
@@ -92,11 +75,10 @@ class PlayBackApi {
     Function(String msg) exceptionHandler,
   ) async {
     try {
-      initServer();
       if (LocalStore.getServerUrl() == null) {
         return;
       }
-      final response = await dio.delete("/delete/playback/$subId");
+      final response = await dio.delete("/playback/delete/$subId");
       if (response.statusCode != 200) {
         exceptionHandler.call("删除所有播放记录失败");
       } else {
@@ -114,11 +96,13 @@ class PlayBackApi {
     Function(String msg) exceptionHandler,
   ) async {
     try {
-      initServer();
       if (LocalStore.getServerUrl() == null) {
         return null;
       }
-      final response = await dio.post("/save/playback", data: playback);
+      final response = await dio.post(
+        "/playback/save",
+        data: playback.toJson(),
+      );
       if (response.statusCode != 200) {
         exceptionHandler.call("保存播放记录失败");
       }

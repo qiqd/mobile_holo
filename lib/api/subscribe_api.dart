@@ -2,34 +2,19 @@ import 'dart:developer';
 
 import 'package:dio/dio.dart';
 import 'package:mobile_holo/entity/subscribe_history.dart';
+import 'package:mobile_holo/util/http_util.dart';
 import 'package:mobile_holo/util/local_store.dart';
 
 class SubscribeApi {
-  static String serverUrl = "";
-  static String token = "";
-
-  static Dio dio = Dio();
-  static void initServer() {
-    serverUrl = LocalStore.getServerUrl() ?? "https://localhost:8080";
-    token = LocalStore.getToken() ?? "";
-    dio.options = BaseOptions(
-      headers: {"Authorization": token, "User-Agent": "Holo/client"},
-      baseUrl: "$serverUrl/subscribe",
-      contentType: "application/json",
-      connectTimeout: const Duration(seconds: 10),
-      receiveTimeout: const Duration(seconds: 10),
-    );
-  }
-
+  static Dio dio = HttpUtil.createDioWithInterceptor();
   static Future<List<SubscribeHistory>> fetchSubscribeHistory(
     Function(String msg) exceptionHandler,
   ) async {
     try {
-      initServer();
       if (LocalStore.getServerUrl() == null) {
         return [];
       }
-      final response = await dio.get("/query/subscribe");
+      final response = await dio.get("/subscribe/query");
       if (response.statusCode == 200) {
         return (response.data as List).map((item) {
           var s = SubscribeHistory.fromJson(item);
@@ -49,11 +34,10 @@ class SubscribeApi {
     Function(String msg) exceptionHandler,
   ) async {
     try {
-      initServer();
       if (LocalStore.getServerUrl() == null) {
         return null;
       }
-      final response = await dio.get("/query/subscribe/$subId");
+      final response = await dio.get("/subscribe/query/$subId");
       if (response.statusCode == 200) {
         return SubscribeHistory.fromJson(response.data);
       }
@@ -70,11 +54,10 @@ class SubscribeApi {
     Function(String msg) exceptionHandler,
   ) async {
     try {
-      initServer();
       if (LocalStore.getServerUrl() == null) {
         return;
       }
-      final response = await dio.delete("/delete/subscribe");
+      final response = await dio.delete("/subscribe/delete");
       if (response.statusCode != 200) {
         exceptionHandler.call("删除所有订阅记录失败");
       } else {
@@ -92,11 +75,10 @@ class SubscribeApi {
     Function(String msg) exceptionHandler,
   ) async {
     try {
-      initServer();
       if (LocalStore.getServerUrl() == null) {
         return;
       }
-      final response = await dio.delete("/delete/subscribe/$subId");
+      final response = await dio.delete("/subscribe/delete/$subId");
       if (response.statusCode != 200) {
         exceptionHandler.call("删除订阅记录失败");
       } else {
@@ -114,11 +96,13 @@ class SubscribeApi {
     Function(String msg) exceptionHandler,
   ) async {
     try {
-      initServer();
       if (LocalStore.getServerUrl() == null) {
         return null;
       }
-      final response = await dio.post("/save/subscribe", data: subscribe);
+      final response = await dio.post(
+        "/subscribe/save",
+        data: subscribe.toJson(),
+      );
       if (response.statusCode != 200) {
         exceptionHandler.call("保存订阅记录失败");
       }

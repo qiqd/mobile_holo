@@ -56,7 +56,7 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: AppBar(
         animateColor: true,
         surfaceTintColor: Colors.red,
-        title: Text("推荐"),
+        title: const Text("推荐"),
         actions: [
           IconButton(
             icon: Icon(Icons.search_rounded),
@@ -73,7 +73,7 @@ class _HomeScreenState extends State<HomeScreen> {
           Expanded(
             child: Center(
               child: _recommended == null
-                  ? Text("暂无推荐")
+                  ? const Text("暂无推荐")
                   : GridView.builder(
                       controller: _scrollController,
                       itemCount: _recommended!.data!.length,

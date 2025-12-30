@@ -1,5 +1,5 @@
+import 'dart:async';
 import 'dart:developer' show log;
-import 'dart:ffi';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -38,7 +38,7 @@ class PlayerScreen extends StatefulWidget {
 }
 
 class _PlayerScreenState extends State<PlayerScreen>
-    with SingleTickerProviderStateMixin, WidgetsBindingObserver {
+    with SingleTickerProviderStateMixin {
   bool _isFullScreen = false;
   String msg = "";
   int episodeIndex = 0;
@@ -48,6 +48,8 @@ class _PlayerScreenState extends State<PlayerScreen>
   bool isloading = false;
   Data? subject;
   int historyPosition = 0;
+  Timer? _syncTimer;
+  String? playUrl;
   late final String nameCn = widget.nameCn;
   late final String mediaId = widget.mediaId;
   late final SourceService source = widget.source;
@@ -104,7 +106,7 @@ class _PlayerScreenState extends State<PlayerScreen>
             msg = "无法获取播放地址,换条路线试试";
           }),
         );
-
+        playUrl = newUrl;
         final newController = VideoPlayerController.networkUrl(
           Uri.parse(newUrl ?? ""),
         );
@@ -190,6 +192,9 @@ class _PlayerScreenState extends State<PlayerScreen>
   }
 
   void _storeLocalHistory() {
+    if (playUrl == null) {
+      return;
+    }
     PlaybackHistory history = PlaybackHistory(
       subId: widget.subject.id!,
       title: nameCn,
@@ -234,35 +239,34 @@ class _PlayerScreenState extends State<PlayerScreen>
   }
 
   @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    super.didChangeAppLifecycleState(state);
-    if (state == AppLifecycleState.paused) {
-      log("pause");
+  void didChangeDependencies() {
+    _syncTimer?.cancel();
+    _syncTimer = Timer.periodic(const Duration(seconds: 30), (timer) {
       _storeLocalHistory();
-    } else if (state == AppLifecycleState.resumed) {
-      log("resume");
-    } else if (state == AppLifecycleState.inactive) {
-      log("inactive");
-    }
+    });
+    super.didChangeDependencies();
   }
 
   @override
   void initState() {
-    WidgetsBinding.instance.addObserver(this);
     _loadHistory();
     _fetchEpisode();
     _fetchMediaEpisode().then(
       (value) => _fetchViewInfo(position: historyPosition),
     );
+    _syncTimer = Timer.periodic(const Duration(seconds: 30), (timer) {
+      log("sync playback history${DateTime.now()}");
+      _storeLocalHistory();
+    });
     super.initState();
   }
 
   @override
   void dispose() {
     _controller?.dispose();
+    _syncTimer?.cancel();
     _storeLocalHistory();
     SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
-    WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }
 
@@ -404,7 +408,7 @@ class _PlayerScreenState extends State<PlayerScreen>
                               child: PopupMenuButton(
                                 child: TextButton.icon(
                                   onPressed: null,
-                                  label: Text('路线选择'),
+                                  label: const Text('路线选择'),
                                 ),
                                 itemBuilder: (context) => [
                                   ...List.generate(
@@ -430,7 +434,9 @@ class _PlayerScreenState extends State<PlayerScreen>
                           child: TabBarView(
                             controller: _tabController,
                             children: [
-                              SizedBox(child: Center(child: Text("暂无评论"))),
+                              SizedBox(
+                                child: const Center(child: Text("暂无评论")),
+                              ),
                               _episode == null
                                   ? LoadingOrShowMsg(msg: msg)
                                   : GridView.builder(

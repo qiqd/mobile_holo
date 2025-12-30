@@ -30,11 +30,12 @@ class _SubscribeScreenState extends State<SubscribeScreen>
     final records = await PlayBackApi.fetchPlaybackHistory((_) {
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(SnackBar(content: Text("获取云端播放记录失败")));
+      ).showSnackBar(const SnackBar(content: Text("获取云端播放记录失败")));
     });
     if (records.isNotEmpty) {
       setState(() {
         playback = records;
+        playback.sort((a, b) => b.createdAt.compareTo(a.createdAt));
         LocalStore.updatePlaybackHistory(records);
       });
     }
@@ -44,11 +45,12 @@ class _SubscribeScreenState extends State<SubscribeScreen>
     final records = await SubscribeApi.fetchSubscribeHistory((_) {
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(SnackBar(content: Text("获取云端订阅记录失败")));
+      ).showSnackBar(const SnackBar(content: Text("获取云端订阅记录失败")));
     });
     if (records.isNotEmpty) {
       setState(() {
         subscribe = records;
+        subscribe.sort((a, b) => b.createdAt.compareTo(a.createdAt));
         LocalStore.updateSubscribeHistory(records);
       });
     }
@@ -88,7 +90,7 @@ class _SubscribeScreenState extends State<SubscribeScreen>
           children: [
             TabBar(
               controller: _tabController,
-              tabs: [
+              tabs: const [
                 Tab(text: '订阅'),
                 Tab(text: '历史记录'),
               ],

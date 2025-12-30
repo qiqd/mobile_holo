@@ -4,9 +4,9 @@ on:
   workflow_dispatch:
     inputs:
       build_type:
-        description: 'Build Type'
+        description: "Build Type"
         required: true
-        default: 'release'
+        default: "release"
         type: choice
         options:
           - debug
@@ -19,23 +19,23 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.38.4'
+          flutter-version: "3.38.4"
           cache: true
-      
+
       - name: Install dependencies
         run: flutter pub get
-      
+
       - name: Build Android APKs for all architectures
         run: |
-          flutter build apk --${{ github.event.inputs.build_type }} --split-per-abi
-      
+          flutter build apk --${{ github.event.inputs.build_type }} --split-per-abi --obfuscate --split-debug-info=debug-info/
+
       - name: List built APKs
         run: ls -la build/app/outputs/flutter-apk/
-      
+
       - name: Upload Android APKs
         uses: actions/upload-artifact@v4
         with:
@@ -48,26 +48,26 @@ jobs:
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.38.4'
+          flutter-version: "3.38.4"
           cache: true
-      
+
       - name: Install dependencies
         run: flutter pub get
-      
+
       - name: Build iOS IPA
         run: |
-          flutter build ios --${{ github.event.inputs.build_type }} --no-codesign
+          flutter build ios --${{ github.event.inputs.build_type }} --no-codesign --obfuscate --split-debug-info=debug-info/
           mkdir -p build/ios/ipa
           cd build/ios
           zip -r ipa/Runner.ipa Release-iphoneos/Runner.app
-      
+
       - name: List built IPA
         run: ls -la build/ios/ipa/
-      
+
       - name: Upload iOS IPA
         uses: actions/upload-artifact@v4
         with:
