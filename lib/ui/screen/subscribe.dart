@@ -100,10 +100,14 @@ class _SubscribeScreenState extends State<SubscribeScreen>
                 controller: _tabController,
                 children: [
                   subscribe.isEmpty
-                      ? LoadingOrShowMsg(msg: '暂无订阅')
+                      ? LoadingOrShowMsg(
+                          msg: '暂无订阅,点我刷新试试',
+                          onMsgTab: () async {
+                            await _fetchSubscribeHistoryFromServer();
+                          },
+                        )
                       : RefreshIndicator(
                           child: GridView.builder(
-                            physics: const AlwaysScrollableScrollPhysics(),
                             padding: const EdgeInsets.all(8),
                             itemCount: subscribe.length,
                             gridDelegate:
@@ -134,10 +138,14 @@ class _SubscribeScreenState extends State<SubscribeScreen>
                           },
                         ),
                   playback.isEmpty
-                      ? LoadingOrShowMsg(msg: '暂无历史记录')
+                      ? LoadingOrShowMsg(
+                          msg: '暂无历史记录,点我刷新试试',
+                          onMsgTab: () async {
+                            await _fetchPlaybackHistoryFromServer();
+                          },
+                        )
                       : RefreshIndicator(
                           child: ListView.separated(
-                            physics: const AlwaysScrollableScrollPhysics(),
                             padding: const EdgeInsets.all(8),
                             separatorBuilder: (context, index) =>
                                 const SizedBox(height: 10),

@@ -20,6 +20,7 @@ class CapVideoPlayer extends StatefulWidget {
   final Function()? onNextTab;
   final Function(int index)? onEpisodeSelected;
   final Function()? onBackPressed;
+  final Function(bool isPlaying)? onPlayOrPause;
   const CapVideoPlayer({
     super.key,
     required this.controller,
@@ -33,6 +34,7 @@ class CapVideoPlayer extends StatefulWidget {
     this.onError,
     this.onEpisodeSelected,
     this.onBackPressed,
+    this.onPlayOrPause,
   });
 
   @override
@@ -376,6 +378,9 @@ class _CapVideoPlayerState extends State<CapVideoPlayer> {
                               } else {
                                 widget.controller.play();
                               }
+                              widget.onPlayOrPause?.call(
+                                widget.controller.value.isPlaying,
+                              );
                               setState(() {});
                             },
                             icon: Icon(

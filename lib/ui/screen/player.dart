@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:developer' show log;
+import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -38,7 +39,7 @@ class PlayerScreen extends StatefulWidget {
 }
 
 class _PlayerScreenState extends State<PlayerScreen>
-    with SingleTickerProviderStateMixin {
+    with SingleTickerProviderStateMixin, WidgetsBindingObserver {
   bool _isFullScreen = false;
   String msg = "";
   int episodeIndex = 0;
@@ -48,13 +49,11 @@ class _PlayerScreenState extends State<PlayerScreen>
   bool isloading = false;
   Data? subject;
   int historyPosition = 0;
-  Timer? _syncTimer;
   String? playUrl;
   late final String nameCn = widget.nameCn;
   late final String mediaId = widget.mediaId;
   late final SourceService source = widget.source;
   VideoPlayerController? _controller;
-
   late final TabController _tabController = TabController(
     vsync: this,
     length: 2,
@@ -215,11 +214,13 @@ class _PlayerScreenState extends State<PlayerScreen>
         DeviceOrientation.landscapeLeft,
         DeviceOrientation.landscapeRight,
       ]);
+
       await SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
     } else {
       await SystemChrome.setPreferredOrientations([
         DeviceOrientation.portraitUp,
       ]);
+
       await SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
     }
   }
@@ -236,31 +237,20 @@ class _PlayerScreenState extends State<PlayerScreen>
     );
   }
 
-  void initListenForPlayer() {
-    _controller?.addListener(() {
-      if (_controller!.value.isPlaying) {
-        if (_syncTimer == null || _syncTimer!.isActive == false) {
-          _startSyncTimer();
-        }
-      } else {
-        _syncTimer?.cancel();
-        _syncTimer = null;
-      }
-    });
-  }
-
-  void _startSyncTimer() {
-    _syncTimer = Timer.periodic(Duration(seconds: 30), (timer) {
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.paused) {
       _storeLocalHistory();
-    });
+    }
+    if (state == AppLifecycleState.inactive) {
+      _storeLocalHistory();
+    }
+    super.didChangeAppLifecycleState(state);
   }
 
   @override
   void didChangeDependencies() {
-    _syncTimer?.cancel();
-    _syncTimer = Timer.periodic(const Duration(minutes: 1), (timer) {
-      _storeLocalHistory();
-    });
+    _storeLocalHistory();
     super.didChangeDependencies();
   }
 
@@ -268,7 +258,7 @@ class _PlayerScreenState extends State<PlayerScreen>
   void initState() {
     _loadHistory();
     _fetchEpisode();
-    initListenForPlayer();
+    WidgetsBinding.instance.addObserver(this);
     _fetchMediaEpisode().then(
       (value) => _fetchViewInfo(position: historyPosition),
     );
@@ -278,10 +268,17 @@ class _PlayerScreenState extends State<PlayerScreen>
   @override
   void dispose() {
     _controller?.dispose();
-    _syncTimer?.cancel();
     _storeLocalHistory();
+    WidgetsBinding.instance.removeObserver(this);
     SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
     super.dispose();
+  }
+
+  @override
+  Future<AppExitResponse> didRequestAppExit() {
+    log("didRequestAppExit");
+    _storeLocalHistory();
+    return super.didRequestAppExit();
   }
 
   @override
