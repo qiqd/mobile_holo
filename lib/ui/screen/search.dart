@@ -116,88 +116,94 @@ class _SearchScreenState extends State<SearchScreen> {
           keyboardType: TextInputType.webSearch,
         ),
       ),
-      body: Column(
-        children: [
-          if (_loading) LinearProgressIndicator(),
-          Expanded(
-            child: SizedBox(
-              child: _recommended == null
-                  ? SingleChildScrollView(
-                      padding: EdgeInsets.all(16),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Padding(
-                            padding: EdgeInsets.only(bottom: 12),
-                            child: Text(
-                              "搜索历史",
-                              style: Theme.of(context).textTheme.titleMedium
-                                  ?.copyWith(fontWeight: FontWeight.bold),
+      body: SafeArea(
+        child: Column(
+          children: [
+            if (_loading) LinearProgressIndicator(),
+            Expanded(
+              child: SizedBox(
+                child: _recommended == null
+                    ? SingleChildScrollView(
+                        padding: EdgeInsets.all(16),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Padding(
+                              padding: EdgeInsets.only(bottom: 12),
+                              child: Text(
+                                "搜索历史",
+                                style: Theme.of(context).textTheme.titleMedium
+                                    ?.copyWith(fontWeight: FontWeight.bold),
+                              ),
                             ),
-                          ),
-                          Wrap(
-                            spacing: 8,
-                            children: _searchHistory.map((historyItem) {
-                              return Chip(
-                                label: InkWell(
-                                  child: Text(historyItem),
-                                  onTap: () =>
-                                      _fetchSearch(historyItem, context),
-                                ),
-                                avatar: Icon(Icons.history, size: 18),
-                                backgroundColor: Theme.of(context)
-                                    .colorScheme
-                                    .surfaceContainerHighest
-                                    .withOpacity(0.5),
-                                deleteIcon: Icon(Icons.close, size: 18),
-                                onDeleted: () {
-                                  setState(() {
-                                    _searchHistory.remove(historyItem);
-                                    LocalStore.saveSearchHistory(
-                                      _searchHistory,
+                            Row(
+                              children: [
+                                Wrap(
+                                  spacing: 8,
+                                  children: _searchHistory.map((historyItem) {
+                                    return Chip(
+                                      label: InkWell(
+                                        child: Text(historyItem),
+                                        onTap: () =>
+                                            _fetchSearch(historyItem, context),
+                                      ),
+                                      avatar: Icon(Icons.history, size: 18),
+                                      backgroundColor: Theme.of(context)
+                                          .colorScheme
+                                          .surfaceContainerHighest
+                                          .withOpacity(0.5),
+                                      deleteIcon: Icon(Icons.close, size: 18),
+                                      onDeleted: () {
+                                        setState(() {
+                                          _searchHistory.remove(historyItem);
+                                          LocalStore.saveSearchHistory(
+                                            _searchHistory,
+                                          );
+                                        });
+                                      },
                                     );
-                                  });
+                                  }).toList(),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      )
+                    : GridView.builder(
+                        itemCount: _recommended!.data!.length,
+                        padding: EdgeInsets.symmetric(horizontal: 12),
+                        gridDelegate:
+                            const SliverGridDelegateWithFixedCrossAxisCount(
+                              mainAxisSpacing: 6,
+                              crossAxisSpacing: 6,
+                              crossAxisCount: 3,
+                              childAspectRatio: 0.6,
+                            ),
+                        itemBuilder: (context, index) {
+                          final item = _recommended!.data![index];
+                          return MediaGrid(
+                            id: item.id!,
+                            imageUrl: item.images?.medium,
+                            title: item.nameCn!.isEmpty
+                                ? item.name ?? ""
+                                : item.nameCn,
+                            rating: item.rating?.score,
+                            onTap: () {
+                              context.push(
+                                '/detail',
+                                extra: {
+                                  'id': item.id!,
+                                  'keyword': item.nameCn ?? item.name ?? "",
                                 },
                               );
-                            }).toList(),
-                          ),
-                        ],
+                            },
+                          );
+                        },
                       ),
-                    )
-                  : GridView.builder(
-                      itemCount: _recommended!.data!.length,
-                      padding: EdgeInsets.symmetric(horizontal: 12),
-                      gridDelegate:
-                          const SliverGridDelegateWithFixedCrossAxisCount(
-                            mainAxisSpacing: 6,
-                            crossAxisSpacing: 6,
-                            crossAxisCount: 3,
-                            childAspectRatio: 0.6,
-                          ),
-                      itemBuilder: (context, index) {
-                        final item = _recommended!.data![index];
-                        return MediaGrid(
-                          id: item.id!,
-                          imageUrl: item.images?.medium,
-                          title: item.nameCn!.isEmpty
-                              ? item.name ?? ""
-                              : item.nameCn,
-                          rating: item.rating?.score,
-                          onTap: () {
-                            context.push(
-                              '/detail',
-                              extra: {
-                                'id': item.id!,
-                                'keyword': item.nameCn ?? item.name ?? "",
-                              },
-                            );
-                          },
-                        );
-                      },
-                    ),
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

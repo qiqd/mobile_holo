@@ -50,6 +50,7 @@ class _PlayerScreenState extends State<PlayerScreen>
   Data? subject;
   int historyPosition = 0;
   String? playUrl;
+  bool _isActive = true;
   late final String nameCn = widget.nameCn;
   late final String mediaId = widget.mediaId;
   late final SourceService source = widget.source;
@@ -114,7 +115,7 @@ class _PlayerScreenState extends State<PlayerScreen>
           setState(() {
             _controller = newController;
             _controller?.seekTo(Duration(seconds: position));
-            _controller?.play();
+            _isActive ? _controller?.play() : _controller?.pause();
           });
         }
       }
@@ -240,7 +241,15 @@ class _PlayerScreenState extends State<PlayerScreen>
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.paused) {
+      setState(() {
+        _isActive = false;
+      });
       _storeLocalHistory();
+    }
+    if (state == AppLifecycleState.resumed) {
+      setState(() {
+        _isActive = true;
+      });
     }
     if (state == AppLifecycleState.inactive) {
       _storeLocalHistory();
