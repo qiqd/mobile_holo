@@ -55,17 +55,25 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       appBar: AppBar(
         animateColor: true,
-        surfaceTintColor: Colors.red,
-        title: const Text("推荐"),
-        actions: [
-          IconButton(
-            icon: Icon(Icons.search_rounded),
-            onPressed: () {
-              context.push('/search');
-            },
+        title: TextField(
+          readOnly: true,
+          decoration: InputDecoration(
+            prefixIcon: Icon(Icons.search_rounded),
+            contentPadding: EdgeInsets.all(0),
+            hintText: "搜索",
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(18),
+              borderSide: BorderSide(color: Colors.grey.shade400),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(18),
+              borderSide: BorderSide(color: Colors.grey.shade400),
+            ),
           ),
-          SizedBox(width: 12),
-        ],
+          onTap: () {
+            context.push('/search');
+          },
+        ),
       ),
       body: Column(
         children: [

@@ -206,6 +206,11 @@ class _SetttingScreenState extends State<SetttingScreen> {
               const Text('开源协议', style: TextStyle(fontWeight: FontWeight.bold)),
               const Text('AGPL-3.0 license'),
               const SizedBox(height: 8),
+              const Text(
+                '番剧元信息',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+              const Text('Bangumi 番组计划'),
               const Text('第三方库', style: TextStyle(fontWeight: FontWeight.bold)),
               const Text('• flutter - BSD License'),
               const Text('• dio - MIT License'),
@@ -240,12 +245,6 @@ class _SetttingScreenState extends State<SetttingScreen> {
               const Text('• visibility_detector - BSD License'),
 
               const SizedBox(height: 8),
-
-              const Text(
-                '番剧元信息',
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-              const Text('Bangumi 番组计划'),
             ],
           ),
         ),

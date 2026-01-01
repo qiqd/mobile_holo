@@ -1,7 +1,6 @@
 import 'dart:developer' show log;
 
 import 'package:dio/dio.dart';
-import 'package:holo/util/http_util.dart';
 import 'package:holo/util/local_store.dart';
 
 class AccountApi {

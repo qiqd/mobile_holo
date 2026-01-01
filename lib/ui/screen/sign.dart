@@ -1,8 +1,7 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:holo/api/account_api.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 enum AuthMode { login, register, reset }
 
@@ -91,6 +90,27 @@ class _SignScreenState extends State<SignScreen> {
     );
   }
 
+  void _showHelpDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text("如何使用"),
+        content: const Text(
+          "由于App不会存储任何有关用户的信息，如果想要保存自己的账号信息，在使用前请部署自己的服务器,点击查看如何部署",
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              launchUrl(Uri.parse('https://github.com/qiqd/holo_backend'));
+            },
+            child: const Text("如何部署"),
+          ),
+          TextButton(onPressed: () => context.pop(), child: const Text("关闭")),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -101,6 +121,14 @@ class _SignScreenState extends State<SignScreen> {
           icon: Icon(Icons.arrow_back_ios_new_rounded),
           onPressed: () => context.pop(),
         ),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.help_outline_rounded),
+            onPressed: () {
+              _showHelpDialog();
+            },
+          ),
+        ],
       ),
       body: LayoutBuilder(
         builder: (context, constraints) {
