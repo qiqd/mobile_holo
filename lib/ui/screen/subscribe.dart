@@ -35,7 +35,7 @@ class _SubscribeScreenState extends State<SubscribeScreen>
     if (records.isNotEmpty) {
       setState(() {
         playback = records;
-        playback.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+        playback.sort((a, b) => b.lastPlaybackAt.compareTo(a.lastPlaybackAt));
         LocalStore.updatePlaybackHistory(records);
       });
     }
@@ -61,7 +61,7 @@ class _SubscribeScreenState extends State<SubscribeScreen>
     playback = playbackHistory;
     final subscribeHistory = LocalStore.getSubscribeHistory();
     subscribe = subscribeHistory;
-    playback.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+    playback.sort((a, b) => b.lastPlaybackAt.compareTo(a.lastPlaybackAt));
     subscribe.sort((a, b) => b.createdAt.compareTo(a.createdAt));
     setState(() {});
   }
@@ -153,7 +153,7 @@ class _SubscribeScreenState extends State<SubscribeScreen>
                             itemBuilder: (context, index) {
                               return MeidaCard(
                                 height: 190,
-                                lastViewAt: playback[index].createdAt,
+                                lastViewAt: playback[index].lastPlaybackAt,
                                 historyEpisode: playback[index].episodeIndex,
                                 id: playback[index].subId,
                                 imageUrl: playback[index].imgUrl,

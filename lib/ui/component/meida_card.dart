@@ -79,10 +79,7 @@ class MeidaCard extends StatelessWidget {
                       // 中文名称
                       Text(
                         nameCn,
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
-                        ),
+                        style: Theme.of(context).textTheme.titleMedium,
                         maxLines: 3,
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -124,15 +121,7 @@ class MeidaCard extends StatelessWidget {
                     children: [
                       if (episode != null)
                         Text(
-                          '共 $episode 集',
-                          style: const TextStyle(
-                            color: Colors.grey,
-                            fontSize: 12,
-                          ),
-                        ),
-                      if (airDate != null)
-                        Text(
-                          airDate!,
+                          episode == 0 ? '待更新' : '共 $episode 集',
                           style: const TextStyle(
                             color: Colors.grey,
                             fontSize: 12,
@@ -151,6 +140,11 @@ class MeidaCard extends StatelessWidget {
                           style: const TextStyle(fontWeight: FontWeight.bold),
                         ),
                       ],
+                    ),
+                  if (airDate != null)
+                    Text(
+                      airDate!,
+                      style: const TextStyle(color: Colors.grey, fontSize: 12),
                     ),
 
                   // 历史集数

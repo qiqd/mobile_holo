@@ -8,6 +8,7 @@ class MediaGrid extends StatelessWidget {
   final double? rating;
   final Function? onTap;
   final bool showRating;
+  final String? airDate;
   const MediaGrid({
     super.key,
     required this.id,
@@ -15,6 +16,7 @@ class MediaGrid extends StatelessWidget {
     this.title,
     this.rating = 0,
     this.showRating = true,
+    this.airDate,
     this.onTap,
   });
 
@@ -42,6 +44,7 @@ class MediaGrid extends StatelessWidget {
                     errorWidget: (context, url, error) => Icon(Icons.error),
                   ),
                 ),
+
                 if (rating != null && showRating)
                   Positioned(
                     right: 4,
@@ -74,6 +77,28 @@ class MediaGrid extends StatelessWidget {
                       ),
                     ),
                   ),
+                // if (airDate != null)
+                //   Positioned(
+                //     left: 4,
+                //     bottom: 4,
+                //     child: Container(
+                //       padding: const EdgeInsets.symmetric(
+                //         horizontal: 6,
+                //         vertical: 2,
+                //       ),
+                //       decoration: BoxDecoration(
+                //         color: Colors.black54,
+                //         borderRadius: BorderRadius.circular(12),
+                //       ),
+                //       child: Text(
+                //         airDate!,
+                //         style: const TextStyle(
+                //           color: Colors.white,
+                //           fontSize: 12,
+                //         ),
+                //       ),
+                //     ),
+                //   ),
               ],
             ),
           ),

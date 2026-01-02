@@ -102,6 +102,12 @@ class _HomeScreenState extends State<HomeScreen> {
                               ? item.name ?? ""
                               : item.nameCn,
                           rating: item.rating?.score,
+                          airDate: item.infobox
+                              ?.firstWhere(
+                                (element) =>
+                                    element.key?.contains("放送开始") ?? false,
+                              )
+                              .value,
                           onTap: () {
                             context.push(
                               '/detail',

@@ -6,7 +6,7 @@ import 'package:holo/api/subscribe_api.dart';
 import 'package:holo/entity/character.dart';
 import 'package:holo/entity/media.dart';
 import 'package:holo/entity/person.dart';
-import 'package:holo/entity/subject.dart' show Data;
+import 'package:holo/entity/subject.dart' show Data, InfoBox;
 import 'package:holo/entity/subject_relation.dart';
 import 'package:holo/entity/subscribe_history.dart';
 import 'package:holo/service/api.dart';
@@ -368,6 +368,12 @@ class _DetailScreenState extends State<DetailScreen>
                     episode: data!.eps ?? 0,
                     rating: data!.rating?.score,
                     height: 250,
+                    airDate: data!.infobox
+                        ?.firstWhere(
+                          (element) => element.key?.contains("放送开始") ?? false,
+                          orElse: () => InfoBox(),
+                        )
+                        .value,
                   ),
                   Expanded(
                     child: Column(
